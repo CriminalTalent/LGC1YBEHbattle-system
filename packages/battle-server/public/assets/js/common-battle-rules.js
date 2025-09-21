@@ -1,5 +1,4 @@
-// packages/battle-server/public/assets/js/common-battle-rules.js
-// PYXIS 공통 전투 룰 (브라우저) - D10 + 60% 성공률 적용판
+// D10 + 60% 성공률 적용판
 // - 스탯: 각 1~5 / HP 최대 100
 // - 아이템(1회용)
 //    • 공격 보정기: 60% 성공 → 해당 '공격 시도 1회'에 한해 공격력 ×2 로 계산
