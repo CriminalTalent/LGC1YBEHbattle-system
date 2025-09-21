@@ -1,7 +1,7 @@
 {
   "name": "pyxis-battle-server",
   "version": "3.0.2",
-  "description": "PYXIS Battle System - 실시간 턴제 전투 서버",
+  "description": "Battle System - 실시간 턴제 전투 서버",
   "main": "index.js",
   "type": "module",
   "scripts": {
