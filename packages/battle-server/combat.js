@@ -1,5 +1,4 @@
 // packages/battle-server/combat.js
-// PYXIS Combat Resolver (ESM) - D10/60% 성공률/완전 수정판
 //
 // 최종 적용된 룰
 // - 모든 주사위 D10(1~10)
