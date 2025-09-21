@@ -1,0 +1,48 @@
+{
+  "name": "pyxis-battle-server",
+  "version": "3.0.2",
+  "description": "PYXIS Battle System - 실시간 턴제 전투 서버",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development nodemon index.js",
+    "start": "cross-env NODE_ENV=production node index.js",
+    "debug": "cross-env NODE_ENV=development node --inspect=0.0.0.0:9229 index.js",
+    "test": "echo 'Tests not implemented yet' && exit 0"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.5",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "express-rate-limit": "^7.1.5",
+    "compression": "^1.7.4",
+    "multer": "^1.4.5-lts.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "cross-env": "^7.0.3"
+  },
+  "engines": {
+    "node": ">=18.17.0",
+    "npm": ">=9.0.0"
+  },
+  "author": {
+    "name": "CriminalTalent",
+    "email": "rntjdrud1@gmail.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CriminalTalent/battle-system.git"
+  },
+  "keywords": [
+    "pyxis",
+    "battle-system",
+    "realtime",
+    "turn-based",
+    "multiplayer",
+    "socket.io",
+    "game"
+  ]
+}

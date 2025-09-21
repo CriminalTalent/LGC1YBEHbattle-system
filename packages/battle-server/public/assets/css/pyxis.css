@@ -1,0 +1,798 @@
+/* PYXIS 배틀 시스템 - 현대적이고 세련된 스타일 */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ===== 현대적 컬러 시스템 ===== */
+:root {
+  /* 깊고 세련된 컬러 팔레트 */
+  --deep-navy: #0a0f1a;
+  --midnight: #0f1419;
+  --navy-mist: #141a24;
+  --navy-light: #1e252f;
+  --navy-surface: #252c38;
+
+  /* 고급스러운 골드 시스템 */
+  --gold: #d4b77e;
+  --gold-dark: #c9a96e;
+  --gold-light: #dcc7a2;
+  --gold-bright: #e6d3aa;
+  --gold-shimmer: #f0e4c5;
+  --gold-subtle: #e2d0a8;
+
+  /* 텍스트 컬러 */
+  --text: #f8f6f0;
+  --text-dim: #e0d5c4;
+  --text-muted: #b8a898;
+  --text-accent: var(--gold-bright);
+
+  /* 글래스모피즘 & 블러 효과 */
+  --glass-subtle: rgba(212,183,126,.03);
+  --glass-light: rgba(212,183,126,.05);
+  --glass-1: rgba(212,183,126,.08);
+  --glass-2: rgba(212,183,126,.12);
+  --glass-3: rgba(212,183,126,.18);
+  --glass-4: rgba(212,183,126,.24);
+
+  /* 테두리 시스템 */
+  --border-subtle: rgba(212,183,126,.06);
+  --border-light: rgba(212,183,126,.12);
+  --border-1: rgba(212,183,126,.18);
+  --border-2: rgba(212,183,126,.32);
+  --border-bright: rgba(212,183,126,.48);
+  --border-gold: rgba(212,183,126,.65);
+
+  /* 그림자 & 깊이 */
+  --shadow-subtle: 0 2px 8px rgba(0,0,0,.1);
+  --shadow-soft: 0 4px 12px rgba(0,0,0,.15);
+  --shadow-medium: 0 8px 24px rgba(0,0,0,.2);
+  --shadow-deep: 0 12px 36px rgba(0,0,0,.3);
+  --shadow-inset: inset 0 1px 0 rgba(255,255,255,.03);
+  --shadow-glow: 0 0 20px rgba(212,183,126,.15);
+
+  /* 블러 효과 */
+  --blur-subtle: blur(4px);
+  --blur-light: blur(8px);
+  --blur-medium: blur(12px);
+  --blur-strong: blur(16px);
+
+  /* 반지름 */
+  --radius: 16px;
+  --radius-small: 8px;
+  --radius-large: 20px;
+  --radius-xl: 24px;
+
+  /* 폰트 */
+  --serif: 'Cinzel', 'Playfair Display', 'Times New Roman', serif;
+  --sans: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* 상태 색상 */
+  --success: #27ae60;
+  --success-light: rgba(39,174,96,.15);
+  --warning: #f39c12;
+  --warning-light: rgba(243,156,18,.15);
+  --danger: #e74c3c;
+  --danger-light: rgba(231,76,60,.15);
+  --info: #3498db;
+  --info-light: rgba(52,152,219,.15);
+
+  /* HP 상태 색상 */
+  --hp-high: #2ecc71;
+  --hp-medium: #f39c12;
+  --hp-low: #e74c3c;
+
+  /* 팀 색상 */
+  --team-a-color: #D4A574;
+  --team-a-bg: rgba(212,165,116,.08);
+  --team-a-border: rgba(212,165,116,.25);
+  --team-b-color: #A5B4C1;
+  --team-b-bg: rgba(165,180,193,.08);
+  --team-b-border: rgba(165,180,193,.25);
+
+  /* 로그 색상 (톤다운) */
+  --log-gold-bg: var(--gold);
+  --log-gold-text: var(--deep-navy);
+  --log-error-bg: var(--deep-navy);
+  --log-error-text: var(--gold);
+  --log-system-text: #8a8a8a;
+  --log-time-color: var(--deep-navy);
+
+  /* 애니메이션 */
+  --transition-fast: 0.15s ease;
+  --transition-medium: 0.25s ease;
+  --transition-slow: 0.4s ease;
+}
+
+/* ===== 기본 설정 ===== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--sans);
+  background: linear-gradient(135deg, var(--deep-navy) 0%, var(--midnight) 50%, var(--navy-mist) 100%);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+}
+
+/* ===== 헤더 ===== */
+.header {
+  background: var(--glass-2);
+  backdrop-filter: var(--blur-light);
+  border-bottom: 1px solid var(--border-light);
+  padding: 20px 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo {
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--gold-bright);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  letter-spacing: 2px;
+}
+
+/* ===== 메인 레이아웃 ===== */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.main-layout {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 24px;
+  min-height: calc(100vh - 120px);
+}
+
+/* ===== 카드 시스템 ===== */
+.card {
+  background: var(--glass-2);
+  backdrop-filter: var(--blur-light);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  padding: 24px;
+  position: relative;
+  transition: all var(--transition-medium);
+  box-shadow: var(--shadow-subtle);
+}
+
+.card::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-inset);
+  background: linear-gradient(145deg, 
+    rgba(220, 199, 162, 0.02) 0%, 
+    transparent 30%, 
+    transparent 70%, 
+    rgba(220, 199, 162, 0.01) 100%);
+  opacity: 0;
+  transition: opacity var(--transition-medium);
+}
+
+.card:hover {
+  border-color: var(--border-2);
+  box-shadow: var(--shadow-soft);
+}
+
+.card:hover::after {
+  opacity: 1;
+}
+
+/* ===== 버튼 시스템 ===== */
+.btn {
+  background: linear-gradient(135deg, var(--gold), var(--gold-bright));
+  color: var(--deep-navy);
+  border: none;
+  border-radius: var(--radius-small);
+  padding: 12px 24px;
+  font-family: var(--serif);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: var(--shadow-subtle);
+}
+
+.btn::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 40%;
+  background: linear-gradient(180deg, rgba(255,255,255,.3), transparent);
+  border-top-left-radius: var(--radius-small);
+  border-top-right-radius: var(--radius-small);
+  opacity: 0.25;
+  transition: opacity var(--transition-fast);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+}
+
+.btn:hover::before {
+  opacity: 0.5;
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn:disabled {
+  background: var(--navy-surface);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn:disabled::before {
+  display: none;
+}
+
+.btn-secondary {
+  background: var(--navy-surface);
+  color: var(--gold);
+  border: 1px solid var(--border-light);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--navy-light);
+  border-color: var(--border-2);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, var(--danger), #c0392b);
+  color: white;
+}
+
+/* ===== 입력 필드 ===== */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-accent);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-control {
+  width: 100%;
+  background: var(--glass-1);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-small);
+  padding: 12px 16px;
+  color: var(--text);
+  font-size: 14px;
+  font-family: var(--sans);
+  transition: all var(--transition-fast);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(212, 183, 126, 0.2);
+  background: var(--glass-2);
+}
+
+/* ===== 플레이어 카드 ===== */
+.player-card {
+  background: var(--glass-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all var(--transition-fast);
+}
+
+.player-card:hover {
+  border-color: var(--border-light);
+  background: var(--glass-2);
+}
+
+.player-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--gold);
+  background: var(--navy-surface);
+  position: relative;
+}
+
+.player-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-medium);
+}
+
+.player-avatar:hover img {
+  transform: scale(1.05);
+}
+
+.player-info {
+  flex: 1;
+}
+
+.player-name {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--gold-bright);
+  margin-bottom: 4px;
+}
+
+.player-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.stat-item {
+  background: var(--glass-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 4px 8px;
+  text-align: center;
+  font-size: 11px;
+}
+
+.stat-label {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.stat-value {
+  color: var(--text-accent);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+/* ===== HP 바 시스템 ===== */
+.hp-container {
+  margin: 8px 0;
+}
+
+.hp-bar {
+  background: var(--navy-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  height: 20px;
+  overflow: hidden;
+  position: relative;
+}
+
+.hp-fill {
+  height: 100%;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 9px;
+  position: relative;
+}
+
+.hp-fill.hp-high {
+  background: linear-gradient(90deg, var(--hp-high), #2ecc71);
+}
+
+.hp-fill.hp-medium {
+  background: linear-gradient(90deg, var(--hp-medium), #f1c40f);
+}
+
+.hp-fill.hp-low {
+  background: linear-gradient(90deg, var(--hp-low), #e74c3c);
+}
+
+.hp-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 11px;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+  z-index: 2;
+}
+
+/* ===== 팀 컨테이너 ===== */
+.team-container {
+  background: var(--glass-1);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  padding: 20px;
+  height: fit-content;
+}
+
+.team-header {
+  font-family: var(--serif);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--gold-bright);
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-light);
+  text-align: center;
+}
+
+.team-player {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--glass-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-small);
+  margin-bottom: 8px;
+  transition: all var(--transition-fast);
+}
+
+.team-player:hover {
+  background: var(--glass-1);
+  border-color: var(--border-light);
+}
+
+.team-player.current-player {
+  border-color: var(--gold);
+  background: rgba(212, 183, 126, 0.1);
+  box-shadow: 0 0 8px rgba(212, 183, 126, 0.2);
+}
+
+/* ===== 액션 버튼 그리드 ===== */
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.action-btn {
+  padding: 16px;
+  font-size: 13px;
+  font-weight: 600;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* ===== 턴 정보 ===== */
+.turn-info {
+  background: var(--glass-2);
+  border: 2px solid var(--border-bright);
+  border-radius: var(--radius);
+  padding: 20px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.turn-number {
+  font-family: var(--serif);
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--gold-bright);
+  margin-bottom: 8px;
+}
+
+.current-team {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.phase-info {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.time-left {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--warning);
+}
+
+/* ===== 로그 & 채팅 ===== */
+.log-container, .chat-container {
+  background: var(--glass-1);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  height: 320px;
+  overflow-y: auto;
+  padding: 16px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.log-entry {
+  margin-bottom: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-small);
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  transition: all var(--transition-fast);
+}
+
+.log-time {
+  color: var(--log-time-color);
+  font-size: 11px;
+  font-weight: 500;
+  min-width: 60px;
+  flex-shrink: 0;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.log-message {
+  flex: 1;
+  color: var(--text);
+}
+
+/* 로그 타입별 스타일 */
+.log-system {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.log-system .log-message {
+  color: var(--log-system-text);
+}
+
+.log-battle {
+  background: var(--log-gold-bg);
+  border: 1px solid var(--gold-dark);
+}
+
+.log-battle .log-message {
+  color: var(--log-gold-text);
+  font-weight: 600;
+}
+
+.log-battle .log-time {
+  color: var(--log-gold-text);
+  background: rgba(10, 15, 26, 0.2);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.log-error {
+  background: var(--log-error-bg);
+  border: 1px solid var(--gold);
+}
+
+.log-error .log-message {
+  color: var(--log-error-text);
+  font-weight: 600;
+}
+
+.log-error .log-time {
+  color: var(--log-error-bg);
+  background: var(--gold);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* ===== 채팅 스타일 ===== */
+.chat-entry {
+  margin-bottom: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-small);
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.chat-time {
+  color: var(--text-muted);
+  font-size: 11px;
+  min-width: 50px;
+  flex-shrink: 0;
+}
+
+.chat-name {
+  color: var(--gold);
+  font-weight: 600;
+  min-width: 80px;
+  flex-shrink: 0;
+}
+
+.chat-message {
+  color: var(--text);
+  flex: 1;
+}
+
+.cheer-message {
+  background: rgba(212, 183, 126, 0.08);
+  border-left: 3px solid var(--gold);
+}
+
+.cheer-message .chat-name {
+  color: var(--gold-bright);
+}
+
+/* ===== 응원 버튼 ===== */
+.cheer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.cheer-btn {
+  background: var(--glass-2);
+  color: var(--gold);
+  border: 1px solid var(--border-light);
+  padding: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all var(--transition-fast);
+}
+
+.cheer-btn:hover {
+  background: var(--gold);
+  color: var(--deep-navy);
+  transform: scale(1.02);
+}
+
+/* ===== 오버레이 ===== */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 15, 26, 0.8);
+  backdrop-filter: var(--blur-medium);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.overlay.show {
+  display: flex;
+}
+
+.overlay-content {
+  background: var(--glass-3);
+  backdrop-filter: var(--blur-strong);
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius-large);
+  padding: 32px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: var(--shadow-deep);
+}
+
+/* ===== 유틸리티 클래스 ===== */
+.hidden { display: none !important; }
+.text-center { text-align: center; }
+.text-gold { color: var(--gold-bright); }
+.text-muted { color: var(--text-muted); }
+.mb-16 { margin-bottom: 16px; }
+.mb-24 { margin-bottom: 24px; }
+.mt-16 { margin-top: 16px; }
+.mt-24 { margin-top: 24px; }
+
+/* ===== 반응형 디자인 ===== */
+@media (max-width: 1200px) {
+  .main-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+  
+  .action-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .cheer-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .player-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .logo {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .action-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .player-card {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .team-player {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+/* ===== 스크롤바 스타일링 ===== */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--navy-surface);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gold);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold-bright);
+}
+
+/* ===== 키프레임 애니메이션 ===== */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease;
+}
+
+.animate-pulse {
+  animation: pulse 2s infinite;
+}

@@ -1,0 +1,445 @@
+/* PYXIS Enhanced Unified Theme - 우아하고 고급스러운 디자인 */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&display=swap');
+
+:root{
+  /* 핵심 컬러 팔레트 - 짙은 네이비 + 골드 */
+  --deep-navy:#0a0f1a; 
+  --midnight:#0f1419; 
+  --navy-mist:#141a24;
+  --navy-light:#1e252f;
+  --navy-surface:#252c38;
+
+  /* 골드 그라데이션 시스템 */
+  --gold:#d4b77e; 
+  --gold-dark:#c9a96e; 
+  --gold-light:#dcc7a2;
+  --gold-bright:#e6d3aa; 
+  --gold-shimmer:#f0e4c5;
+  --gold-subtle:#e2d0a8;
+
+  /* 텍스트 색상 */
+  --text:#f8f6f0; 
+  --text-dim:#e0d5c4; 
+  --text-muted:#b8a898;
+  --text-accent:var(--gold-bright);
+
+  /* 글래스모피즘 효과 */
+  --glass-subtle:rgba(212,183,126,.03);
+  --glass-light:rgba(212,183,126,.05);
+  --glass-1:rgba(212,183,126,.08);
+  --glass-2:rgba(212,183,126,.12);
+  --glass-3:rgba(212,183,126,.18);
+  --glass-4:rgba(212,183,126,.24);
+
+  /* 테두리 시스템 */
+  --border-subtle:rgba(212,183,126,.06);
+  --border-light:rgba(212,183,126,.12);
+  --border-1:rgba(212,183,126,.18);
+  --border-2:rgba(212,183,126,.32);
+  --border-bright:rgba(212,183,126,.48);
+  --border-gold:rgba(212,183,126,.65);
+
+  /* 그림자 시스템 */
+  --shadow-subtle:0 2px 8px rgba(0,0,0,.1);
+  --shadow-soft:0 4px 12px rgba(0,0,0,.15);
+  --shadow-medium:0 8px 24px rgba(0,0,0,.2);
+  --shadow-deep:0 12px 36px rgba(0,0,0,.3);
+  --shadow-inset:inset 0 1px 0 rgba(255,255,255,.03);
+  --shadow-glow:0 0 20px rgba(212,183,126,.15);
+
+  /* 블러 효과 */
+  --blur-subtle:blur(4px);
+  --blur-light:blur(8px);
+  --blur-medium:blur(12px);
+  --blur-strong:blur(16px);
+
+  /* 기하학적 요소 */
+  --radius:14px;
+  --radius-small:8px;
+  --radius-large:18px;
+  --radius-xl:24px;
+  
+  /* 폰트 시스템 */
+  --serif:'Cinzel', 'Playfair Display', 'Times New Roman', serif;
+  --sans:'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans KR", Arial, sans-serif;
+  
+  /* 상태 색상 */
+  --success:#27ae60;
+  --success-light:rgba(39,174,96,.15);
+  --warning:#f39c12;
+  --warning-light:rgba(243,156,18,.15);
+  --danger:#e74c3c;
+  --danger-light:rgba(231,76,60,.15);
+  --info:#3498db;
+  --info-light:rgba(52,152,219,.15);
+
+  /* 팀별 색상 시스템 */
+  --team-a-color:#D4A574;
+  --team-a-bg:rgba(212,165,116,.08);
+  --team-a-border:rgba(212,165,116,.25);
+  
+  --team-b-color:#A5B4C1;
+  --team-b-bg:rgba(165,180,193,.08);
+  --team-b-border:rgba(165,180,193,.25);
+  
+  /* 응원 색상 */
+  --cheer-color:#E6D3AA;
+  --cheer-bg:rgba(230,211,170,.10);
+  --cheer-border:rgba(230,211,170,.3);
+  
+  /* 로그 타입별 색상 */
+  --log-system:#9B9B9B;
+  --log-battle:#D4A574;
+  --log-admin:#B8A898;
+  --log-item:#A8B8A8;
+  --log-error:#C4A8A8;
+  --log-notice:#D4C4A8;
+}
+
+/* 기본 설정 및 리셋 */
+*{ 
+  box-sizing:border-box; 
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+html,body{ height:100%; margin:0; overflow-x:hidden; }
+
+/* 배경 */
+body{
+  color:var(--text); 
+  font-family:var(--sans);
+  font-weight:400;
+  line-height:1.6;
+  background:
+    radial-gradient(circle at 15% -10%, rgba(212,183,126,.12) 0%, transparent 50%),
+    radial-gradient(circle at 85% 110%, rgba(212,183,126,.08) 0%, transparent 50%),
+    radial-gradient(circle at 45% 30%, rgba(212,183,126,.05) 0%, transparent 60%),
+    linear-gradient(145deg, var(--deep-navy) 0%, var(--midnight) 35%, var(--navy-mist) 70%, var(--navy-light) 100%);
+  background-attachment:fixed;
+  background-size:100% 100%, 120% 120%, 80% 80%, 100% 100%;
+  position:relative;
+}
+body::before{
+  content:''; position:fixed; inset:0;
+  background:
+    radial-gradient(circle at 20% 80%, rgba(212,183,126,.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(212,183,126,.02) 0%, transparent 50%);
+  pointer-events:none; z-index:-1;
+}
+
+/* 레이아웃 */
+.container{ max-width:1400px; margin:0 auto; padding:20px; }
+.wrap{ max-width:1280px; margin:0 auto; }
+.row{ display:grid; grid-template-columns:1fr 1fr; gap:18px; align-items:end; }
+@media (max-width:800px){ .row{ grid-template-columns:1fr; } }
+.grid{ display:grid; gap:16px; }
+.hidden{ display:none !important; }
+
+/* 헤더/브랜딩(선택적) */
+.hero{ position:relative; text-align:center; padding:48px 20px 20px; overflow:hidden; }
+.hero::before{
+  content:''; position:absolute; inset:-60% -25% auto -25%; height:500px;
+  background:conic-gradient(from 0deg at 50% 50%, rgba(212,183,126,.18) 0deg, rgba(212,183,126,.08) 45deg, rgba(212,183,126,.22) 90deg, rgba(212,183,126,.05) 135deg, rgba(212,183,126,.18) 180deg, rgba(212,183,126,.08) 225deg, rgba(212,183,126,.22) 270deg, rgba(212,183,126,.05) 315deg, rgba(212,183,126,.18) 360deg);
+  filter:blur(80px); animation:celestialRotate 60s linear infinite; opacity:.7; pointer-events:none; z-index:-1;
+}
+@keyframes celestialRotate{ 0%{transform:rotate(0) scale(1)} 25%{transform:rotate(90deg) scale(1.05)} 50%{transform:rotate(180deg) scale(.95)} 75%{transform:rotate(270deg) scale(1.08)} 100%{transform:rotate(360deg) scale(1)} }
+
+/* 카드/패널 */
+.card,.panel{
+  background:linear-gradient(145deg, rgba(15,20,25,.92) 0%, rgba(20,26,36,.88) 25%, rgba(25,31,42,.92) 50%, rgba(20,26,36,.88) 75%, rgba(15,20,25,.92) 100%);
+  border:1px solid var(--border-1); border-radius:var(--radius); padding:24px;
+  backdrop-filter:var(--blur-medium) saturate(130%); 
+  box-shadow:var(--shadow-medium), var(--shadow-inset), var(--shadow-glow);
+  position:relative; overflow:hidden; transition:all var(--transition-normal);
+}
+.card::before,.panel::before{
+  content:''; position:absolute; top:0; left:24px; right:24px; height:1px;
+  background:linear-gradient(90deg, transparent, var(--gold-subtle) 40%, var(--gold) 50%, var(--gold-subtle) 60%, transparent); opacity:.6;
+}
+.card:hover{ transform:translateY(-3px); border-color:var(--border-2); box-shadow:var(--shadow-deep), var(--shadow-inset), 0 0 30px rgba(212,183,126,.2); }
+
+/* 섹션 헤더 */
+.section-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; padding-bottom:12px; border-bottom:1px solid var(--border-subtle); }
+.section-title{
+  font-family:var(--serif); font-weight:700; color:var(--gold-bright); font-size:20px;
+  position:relative; padding-left:20px; letter-spacing:.02em;
+}
+.section-title::before{
+  content:''; position:absolute; left:0; top:50%; transform:translateY(-50%);
+  width:6px; height:75%; background:linear-gradient(to bottom, var(--gold-bright), var(--gold-dark)); border-radius:3px; box-shadow:0 0 12px rgba(212,183,126,.4);
+}
+
+/* 버튼 */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:12px 24px;
+  border:2px solid var(--border-1); border-radius:var(--radius-small);
+  background:linear-gradient(145deg, rgba(30,37,47,.9), rgba(20,26,36,.9));
+  color:var(--text); font-family:var(--sans); font-size:14px; font-weight:600;
+  text-decoration:none; cursor:pointer; transition:all var(--transition-normal);
+  position:relative; overflow:hidden; min-width:120px; backdrop-filter:var(--blur-light); box-shadow:var(--shadow-soft);
+}
+.btn::before{
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg, rgba(212,183,126,.1), transparent 40%, rgba(212,183,126,.05)); opacity:0; transition:opacity var(--transition-normal);
+}
+.btn:hover:not(:disabled){ transform:translateY(-2px); border-color:var(--gold); box-shadow:var(--shadow-medium), 0 0 20px rgba(212,183,126,.3); color:var(--gold-bright); }
+.btn:hover:not(:disabled)::before{ opacity:1; }
+.btn:active{ transform:translateY(0); }
+.btn:disabled{ opacity:.5; cursor:not-allowed; transform:none; }
+.btn-gold{ background:linear-gradient(145deg, var(--gold-bright), var(--gold-dark)); color:var(--deep-navy); border-color:var(--gold); font-weight:700; box-shadow:var(--shadow-soft), 0 0 15px rgba(212,183,126,.2); }
+.btn-gold:hover:not(:disabled){ background:linear-gradient(145deg, var(--gold-shimmer), var(--gold)); box-shadow:var(--shadow-medium), 0 0 25px rgba(212,183,126,.4); transform:translateY(-2px) scale(1.02); }
+.btn-danger{ background:linear-gradient(145deg, var(--danger), #c0392b); color:#fff; border-color:var(--danger); }
+.btn-success{ background:linear-gradient(145deg, var(--success), #219a52); color:#fff; border-color:var(--success); }
+
+/* 입력 */
+.field{ display:flex; flex-direction:column; gap:8px; margin-bottom:16px; }
+.field label{ font-weight:600; color:var(--text-dim); font-size:13px; letter-spacing:.02em; margin-left:4px; }
+.input,.select,.textarea{
+  padding:12px 16px; background:linear-gradient(145deg, rgba(10,15,26,.8), rgba(15,20,28,.9));
+  border:2px solid var(--border-1); border-radius:var(--radius-small); color:var(--text); font-family:var(--sans); font-size:14px; transition:all var(--transition-normal);
+  backdrop-filter:var(--blur-light); box-shadow:inset 0 2px 6px rgba(0,0,0,.2);
+}
+.input:focus,.select:focus,.textarea:focus{
+  outline:none; border-color:var(--gold);
+  background:linear-gradient(145deg, rgba(15,20,28,.9), rgba(20,25,35,.95));
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.3), 0 0 0 3px rgba(212,183,126,.2), 0 0 15px rgba(212,183,126,.15);
+}
+
+/* 스탯/바 */
+.stat{ display:flex; align-items:center; gap:12px; padding:8px 12px; background:var(--glass-1); border:1px solid var(--border-subtle); border-radius:var(--radius-small); }
+.stat-label{ font-weight:600; color:var(--text-dim); min-width:60px; font-size:12px; }
+.stat-value{ font-weight:700; color:var(--gold-bright); min-width:30px; text-align:right; }
+.stat-bar{ flex:1; height:8px; background:rgba(20,26,36,.8); border-radius:4px; overflow:hidden; box-shadow:inset 0 2px 4px rgba(0,0,0,.3); }
+.stat-fill{ height:100%; background:linear-gradient(90deg, var(--gold), var(--gold-bright)); border-radius:4px; transition:width var(--transition-normal); position:relative; box-shadow:0 0 8px rgba(212,183,126,.4); }
+.stat-fill::after{ content:''; position:absolute; inset:0; background:linear-gradient(90deg, transparent, rgba(255,255,255,.2), transparent); animation:statGleam 2s ease-in-out infinite; }
+@keyframes statGleam{ 0%,100%{ transform:translateX(-100%); opacity:0; } 50%{ transform:translateX(100%); opacity:1; } }
+
+/* HP 바 */
+.hp-bar{ background:linear-gradient(90deg, #2d5016, #4a7c59); }
+.hp-bar.low{ background:linear-gradient(90deg, #7f1d1d, #dc2626); }
+.hp-bar.critical{ background:linear-gradient(90deg, #7f1d1d, #dc2626); animation:criticalPulse 1s ease-in-out infinite alternate; }
+@keyframes criticalPulse{ 0%{ box-shadow:0 0 8px rgba(220,38,38,.4); } 100%{ box-shadow:0 0 20px rgba(220,38,38,.8); } }
+
+/* 타이머 */
+.timer{ display:flex; align-items:center; gap:8px; font-family:var(--serif); font-weight:700; font-size:18px; color:var(--gold-bright); padding:8px 16px; background:var(--glass-2); border:1px solid var(--border-1); border-radius:var(--radius); box-shadow:var(--shadow-soft); }
+.timer.warning{ color:#f39c12; animation:timerWarning 1s ease-in-out infinite alternate; }
+.timer.critical{ color:#e74c3c; animation:timerCritical .5s ease-in-out infinite alternate; }
+@keyframes timerWarning{ 0%{ box-shadow:var(--shadow-soft); } 100%{ box-shadow:var(--shadow-soft), 0 0 15px rgba(243,156,18,.4); } }
+@keyframes timerCritical{ 0%{ box-shadow:var(--shadow-soft); } 100%{ box-shadow:var(--shadow-soft), 0 0 20px rgba(231,76,60,.6); } }
+
+/* 아바타 */
+.avatar{ width:80px; height:80px; border-radius:50%; border:3px solid var(--gold); box-shadow:var(--shadow-medium), 0 0 15px rgba(212,183,126,.2); background:var(--glass-2); overflow:hidden; position:relative; }
+.avatar img{ width:100%; height:100%; object-fit:cover; }
+.avatar::after{
+  content:''; position:absolute; inset:-3px; border-radius:50%; padding:3px;
+  background:linear-gradient(135deg, var(--gold-bright), transparent, var(--gold));
+  mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); mask-composite:exclude;
+  animation:avatarGlow 3s ease-in-out infinite;
+}
+@keyframes avatarGlow{ 0%,100%{ opacity:.6; } 50%{ opacity:1; } }
+
+/* 상태 */
+.status{ display:inline-flex; align-items:center; gap:6px; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; }
+.status.online{ background:var(--success-light); color:var(--success); border:1px solid var(--success); }
+.status.offline{ background:rgba(156,163,175,.15); color:#9ca3af; border:1px solid #9ca3af; }
+.status.ready{ background:var(--info-light); color:var(--info); border:1px solid var(--info); }
+.status.waiting{ background:var(--warning-light); color:var(--warning); border:1px solid var(--warning); }
+
+/* 플레이어 카드 (중복 제거: 이 정의만 유지) */
+.player-card{
+  display:flex; align-items:center; gap:12px; padding:12px;
+  background:var(--glass-1); border:1px solid var(--border-subtle); border-radius:var(--radius);
+  transition:all var(--transition-fast);
+}
+.player-card:hover{ background:var(--glass-2); border-color:var(--border-light); transform:translateY(-1px); }
+.player-info{ flex:1; }
+.player-name{ font-weight:700; color:var(--text); margin-bottom:4px; }
+.player-stats{ display:flex; gap:12px; font-size:12px; color:var(--text-muted); line-height:1.4; }
+.stats b{ color:var(--gold-bright); font-weight:700; }
+
+/* 로그/채팅 패널 */
+.log,.chatlog,.log-viewer,.chat-messages,.battle-log{
+  background:linear-gradient(145deg, rgba(5,15,28,.95) 0%, rgba(8,20,35,.92) 50%, rgba(5,15,28,.95) 100%);
+  border:1px solid var(--border-1); border-radius:var(--radius); padding:18px; 
+  overflow-y:auto; font-size:13px; line-height:1.5; backdrop-filter:var(--blur-light);
+  box-shadow:inset 0 3px 12px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.02), var(--shadow-soft);
+}
+.log{ height:300px; }
+.chatlog,.chat-messages{ height:220px; }
+.battle-log{ height:200px; }
+.log-viewer{ min-height:500px; }
+
+/* === 채팅 메시지 스타일 === */
+.chat-message,.chat-entry,.chat-line{
+  display:flex; gap:8px; align-items:flex-start; margin-bottom:6px; padding:8px 12px;
+  border-radius:8px; border-left:2px solid transparent; transition:all var(--transition-fast);
+  font-size:13px; line-height:1.4;
+}
+.chat-message:hover,.chat-entry:hover,.chat-line:hover{ background:rgba(212,183,126,.03); }
+
+/* 채팅 시간/이름/내용 */
+.chat-time{ font-size:11px; color:#666 !important; min-width:50px; font-weight:500; opacity:.8; }
+.chat-name,.chat-sender{ font-weight:700; min-width:80px; font-size:12px; }
+.chat-content,.chat-text{ flex:1; color:var(--text-dim); word-wrap:break-word; }
+
+/* A팀 채팅 */
+.chat-message.team-a,.chat-entry.team-a,.chat-line.team-a{ background:var(--team-a-bg); border-left-color:var(--team-a-border); }
+.chat-message.team-a .chat-name,.chat-entry.team-a .chat-sender,.chat-line.team-a .chat-sender{ color:var(--team-a-color); }
+
+/* B팀 채팅 */
+.chat-message.team-b,.chat-entry.team-b,.chat-line.team-b{ background:var(--team-b-bg); border-left-color:var(--team-b-border); }
+.chat-message.team-b .chat-name,.chat-entry.team-b .chat-sender,.chat-line.team-b .chat-sender{ color:var(--team-b-color); }
+
+/* 응원 메시지 */
+.chat-message.cheer,.chat-entry.cheer,.chat-line.cheer{
+  background:var(--cheer-bg); border-left-color:var(--cheer-border); border-left-width:3px;
+}
+.chat-message.cheer .chat-name,.chat-entry.cheer .chat-sender,.chat-line.cheer .chat-sender{
+  color:var(--cheer-color); font-weight:800;
+}
+.chat-message.cheer .chat-content,.chat-entry.cheer .chat-text,.chat-line.cheer .chat-text{
+  color:var(--cheer-color); font-weight:600;
+}
+
+/* 관리자 채팅 */
+.chat-message.admin,.chat-entry.admin,.chat-line.admin{
+  background:rgba(184,168,152,.08); border-left-color:var(--log-admin); border-left-width:3px;
+}
+.chat-message.admin .chat-name,.chat-entry.admin .chat-sender{ color:var(--log-admin); font-weight:800; }
+.chat-message.admin .chat-content,.chat-entry.admin .chat-text{ color:var(--log-admin); font-weight:600; }
+
+/* === 로그 메시지 스타일 === */
+.log-entry,.log-line,.tl-line{
+  display:flex; gap:8px; align-items:flex-start; margin-bottom:4px; padding:6px 12px;
+  border-radius:6px; border-left:2px solid transparent; font-size:12px; line-height:1.5; transition:all var(--transition-fast);
+}
+.log-entry:hover,.log-line:hover,.tl-line:hover{ background:rgba(212,183,126,.02); }
+
+/* 로그 시간/내용 */
+.log-time{ font-size:10px; color:#666 !important; min-width:50px; font-weight:500; opacity:.8; }
+.log-content,.log-text{ flex:1; word-wrap:break-word; }
+
+/* 시스템 로그 */
+.log-entry.system,.log-line.system,.tl-system{ border-left-color:var(--log-system); background:rgba(155,155,155,.06); }
+.log-entry.system .log-content,.log-line.system .log-text,.tl-system{ color:var(--log-system); font-weight:500; }
+
+/* 전투 로그 */
+.log-entry.battle,.log-line.battle,.tl-battle{ border-left-color:var(--log-battle); background:rgba(212,165,116,.06); }
+.log-entry.battle .log-content,.log-line.battle .log-text,.tl-battle{ color:var(--log-battle); font-weight:600; }
+
+/* 관리자 로그 */
+.log-entry.admin,.log-line.admin{ border-left-color:var(--log-admin); background:rgba(184,168,152,.06); border-left-width:3px; }
+.log-entry.admin .log-content,.log-line.admin .log-text{ color:var(--log-admin); font-weight:700; }
+
+/* 아이템 로그 */
+.log-entry.item,.log-line.item{ border-left-color:var(--log-item); background:rgba(168,184,168,.06); }
+.log-entry.item .log-content,.log-line.item .log-text{ color:var(--log-item); font-weight:600; }
+
+/* 에러 로그 */
+.log-entry.error,.log-line.error{ border-left-color:var(--log-error); background:rgba(196,168,168,.06); border-left-width:3px; }
+.log-entry.error .log-content,.log-line.error .log-text{ color:var(--log-error); font-weight:700; }
+
+/* 알림 로그 */
+.log-entry.notice,.log-line.notice{ border-left-color:var(--log-notice); background:rgba(212,196,168,.06); }
+.log-entry.notice .log-content,.log-line.notice .log-text{ color:var(--log-notice); font-weight:600; }
+
+/* 결과 로그 강조 */
+.log-entry.result,.log-line.result,.tl-result{
+  background:var(--glass-3) !important; border:1px solid var(--border-gold); border-left:4px solid var(--gold-bright); box-shadow:0 2px 8px rgba(212,183,126,.15);
+}
+.log-entry.result .log-content,.log-line.result .log-text,.tl-result{
+  color:var(--gold-bright) !important; font-weight:800 !important; text-shadow:0 1px 3px rgba(212,183,126,.3);
+}
+
+/* 응원 로그(채팅용) */
+.tl-cheer{ border-left-color:var(--cheer-border); background:var(--cheer-bg); color:var(--cheer-color); font-weight:600; }
+
+/* 발신자 배지 */
+.chat-message.team-a .chat-name::before,.chat-entry.team-a .chat-sender::before{
+  content:"A"; display:inline-block; width:14px; height:14px; background:var(--team-a-color); color:var(--deep-navy);
+  font-size:9px; font-weight:800; text-align:center; line-height:14px; border-radius:2px; margin-right:6px; vertical-align:middle;
+}
+.chat-message.team-b .chat-name::before,.chat-entry.team-b .chat-sender::before{
+  content:"B"; display:inline-block; width:14px; height:14px; background:var(--team-b-color); color:var(--deep-navy);
+  font-size:9px; font-weight:800; text-align:center; line-height:14px; border-radius:2px; margin-right:6px; vertical-align:middle;
+}
+.chat-message.cheer .chat-name::before,.chat-entry.cheer .chat-sender::before{
+  content:"응원"; display:inline-block; background:var(--cheer-color); color:var(--deep-navy);
+  font-size:8px; font-weight:800; padding:1px 4px; border-radius:2px; margin-right:6px; vertical-align:middle;
+}
+.chat-message.admin .chat-name::before,.chat-entry.admin .chat-sender::before{
+  content:"관리자"; display:inline-block; background:var(--log-admin); color:var(--deep-navy);
+  font-size:8px; font-weight:800; padding:1px 4px; border-radius:2px; margin-right:6px; vertical-align:middle;
+}
+
+/* 애니메이션 */
+.chat-message.new,.log-entry.new{ animation:newMessage .5s ease-out; }
+@keyframes newMessage{ from{ opacity:0; transform:translateY(-10px); } to{ opacity:1; transform:translateY(0); } }
+.log-entry.highlight,.chat-message.highlight{ animation:highlight 1s ease-in-out; }
+@keyframes highlight{ 0%,100%{ background:rgba(212,183,126,.03); } 50%{ background:rgba(212,183,126,.12); } }
+
+/* 기존 호환 스타일 */
+.log-entry.system .log-content,.chat-message.system .chat-content{ color:var(--log-system); font-weight:600; }
+.log-entry.action .log-content{ color:var(--log-battle); font-weight:600; }
+.chat-message.team .chat-content{ color:var(--info); }
+
+/* 스크롤바 */
+.log::-webkit-scrollbar,.chatlog::-webkit-scrollbar,.log-viewer::-webkit-scrollbar,.chat-messages::-webkit-scrollbar,.battle-log::-webkit-scrollbar{ width:8px; }
+.log::-webkit-scrollbar-track,.chatlog::-webkit-scrollbar-track,.log-viewer::-webkit-scrollbar-track,.chat-messages::-webkit-scrollbar-track,.battle-log::-webkit-scrollbar-track{ background:rgba(5,15,28,.8); border-radius:4px; }
+.log::-webkit-scrollbar-thumb,.chatlog::-webkit-scrollbar-thumb,.log-viewer::-webkit-scrollbar-thumb,.chat-messages::-webkit-scrollbar-thumb,.battle-log::-webkit-scrollbar-thumb{
+  background:linear-gradient(to bottom, var(--gold), var(--gold-dark)); border-radius:4px; border:1px solid rgba(0,0,0,.2);
+}
+.log::-webkit-scrollbar-thumb:hover,.chatlog::-webkit-scrollbar-thumb:hover,.log-viewer::-webkit-scrollbar-thumb:hover,.chat-messages::-webkit-scrollbar-thumb:hover,.battle-log::-webkit-scrollbar-thumb:hover{
+  background:linear-gradient(to bottom, var(--gold-bright), var(--gold));
+}
+
+/* 팀 헤더 */
+.team-header{
+  text-align:center; font-family:var(--serif); font-weight:700; font-size:16px; color:var(--gold-bright);
+  padding:12px 16px; background:linear-gradient(135deg, rgba(212,183,126,.12), rgba(212,183,126,.06)); 
+  border:1px solid var(--border-1); border-radius:var(--radius); position:relative;
+  text-shadow:0 2px 8px rgba(212,183,126,.3); box-shadow:var(--shadow-subtle);
+}
+.team-header::before{
+  content:''; position:absolute; top:0; left:25%; right:25%; height:1px;
+  background:linear-gradient(90deg, transparent, var(--gold-bright), transparent);
+}
+.team-header.phoenix{ background:linear-gradient(135deg, rgba(231,76,60,.12), rgba(231,76,60,.06)); border-color:rgba(231,76,60,.4); color:#FF6B6B; }
+.team-header.death-eater{ background:linear-gradient(135deg, rgba(46,125,50,.12), rgba(46,125,50,.06)); border-color:rgba(46,125,50,.4); color:#66BB6A; }
+
+/* 유틸 */
+.hide{ display:none !important; }
+.loading{ opacity:.6; pointer-events:none; position:relative; }
+.loading::after{
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(90deg, transparent, rgba(212,183,126,.15), transparent);
+  animation:shimmer 1.8s infinite; border-radius:inherit;
+}
+@keyframes shimmer{ 0%{ transform:translateX(-100%); } 100%{ transform:translateX(100%); } }
+.copy-success{ animation:copyFeedback .6s var(--ease-bounce); }
+@keyframes copyFeedback{ 0%{ background:var(--success); color:#fff; transform:scale(1); } 50%{ transform:scale(1.05); } 100%{ background:var(--success); color:#fff; transform:scale(1); } }
+
+/* 배경 반짝임 */
+.twinkle-bg{ position:relative; overflow:hidden; }
+.twinkle-bg::before{
+  content:''; position:absolute; inset:0;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(212,183,126,.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(212,183,126,.02) 0%, transparent 50%),
+    radial-gradient(circle at 40% 80%, rgba(212,183,126,.04) 0%, transparent 50%);
+  animation:twinkleMove 8s ease-in-out infinite; pointer-events:none;
+}
+@keyframes twinkleMove{ 0%,100%{ opacity:.7; } 50%{ opacity:1; } }
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .chat-time,.log-time{ min-width:40px; font-size:9px; }
+  .chat-name,.chat-sender{ min-width:60px; font-size:11px; }
+  .chat-message,.chat-entry,.log-entry{ padding:6px 8px; font-size:12px; }
+  .chat-message.team-a .chat-name::before,
+  .chat-entry.team-a .chat-sender::before,
+  .chat-message.team-b .chat-name::before,
+  .chat-entry.team-b .chat-sender::before{
+    width:12px; height:12px; font-size:8px; line-height:12px;
+  }
+}

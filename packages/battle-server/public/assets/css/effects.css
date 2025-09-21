@@ -1,0 +1,94 @@
+/* PYXIS Effects.css
+   - effects.js 연동 스타일
+   - 네이비/골드 테마 일관성 유지
+*/
+
+/* 색상 변수(존재 시 사용) */
+:root{
+  --deep-navy: #00080D;
+  --glass-2: rgba(20, 30, 45, 0.9);
+  --gold-1: #DCC7A2;
+  --gold-2: #D4BA8D;
+  --gold-bright: #F0E6C7;
+  --text: #E5E7EB;
+  --success: #10B981;
+  --danger: #EF4444;
+  --warning: #F59E0B;
+  --info: #3B82F6;
+}
+
+/* 결과 배너 */
+.pyxis-banner{
+  position:fixed;
+  left:50%; top:24px;
+  transform:translateX(-50%) translateY(-6px);
+  padding:10px 16px;
+  border:1px solid rgba(212,183,126,.6);
+  border-radius:12px;
+  background:var(--glass-2, rgba(20,30,45,.9));
+  -webkit-backdrop-filter: blur(8px) saturate(160%);
+  backdrop-filter: blur(8px) saturate(160%);
+  color:var(--gold-1,#DCC7A2);
+  font-weight:700;
+  letter-spacing:.02em;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .25s, transform .25s, border-color .25s;
+  z-index:9999;
+  box-shadow:0 8px 24px rgba(0,0,0,.35);
+}
+.pyxis-banner.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+.pyxis-banner.info{ border-color:var(--gold-2,#D4BA8D); }
+.pyxis-banner.first{ border-color:var(--info,#3B82F6); }
+.pyxis-banner.kill{ border-color:var(--danger,#EF4444); }
+.pyxis-banner.win{  border-color:var(--success,#10B981); }
+.pyxis-banner.resolve{ border-color:var(--gold-2,#D4BA8D); }
+.pyxis-banner.commit{  border-color:var(--gold-1,#DCC7A2); }
+.pyxis-banner.critical{ border-color:var(--warning,#F59E0B); }
+.pyxis-banner.dodge{    border-color:var(--success,#10B981); }
+.pyxis-banner.defend{   border-color:var(--info,#3B82F6); }
+.pyxis-banner.item{     border-color:var(--gold-1,#DCC7A2); }
+
+/* 카드 호버 리프트 */
+.lift{
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(0,0,0,.35);
+}
+
+/* 버튼 쉬머 */
+.shimmer{
+  background-image: linear-gradient(90deg, transparent, rgba(212,183,126,.15), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 1.8s linear infinite;
+}
+@keyframes shimmer{
+  from{ background-position: -200% 0; }
+  to{   background-position: 200% 0; }
+}
+
+/* 백드롭 블러 */
+.backdrop-blur{
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  backdrop-filter: blur(12px) saturate(180%);
+}
+
+/* 타임라인 신규 항목 플래시 */
+.tl-flash{ animation: tlflash .8s ease; }
+@keyframes tlflash{
+  from{ background: rgba(212,183,126,.08); }
+  to{   background: transparent; }
+}
+
+/* 트윙클 스타 */
+.twinkle-star.twinkle{ animation: twinkle 1.2s ease-in-out; }
+@keyframes twinkle{
+  0%{ opacity:.4; transform: scale(.98); }
+  50%{ opacity:1; transform: scale(1); }
+  100%{ opacity:.4; transform: scale(.98); }
+}
+
+/* 로그 항목 공통 태그(선택) */
+.log-item{ border-left:2px solid transparent; padding-left:8px; }
+.log-item.info{ border-left-color: var(--info,#3B82F6); background: rgba(59,130,246,.08); }
+.log-item.warn{ border-left-color: var(--warning,#F59E0B); background: rgba(245,158,11,.08); }
+.log-item.err{  border-left-color: var(--danger,#EF4444); background: rgba(239,68,68,.08); }

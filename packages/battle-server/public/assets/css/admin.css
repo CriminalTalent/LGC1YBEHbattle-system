@@ -1,0 +1,712 @@
+/* PYXIS 관리자 페이지 추가 스타일 */
+
+/* 전체 컨테이너 왼쪽 정렬 */
+.admin-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+  text-align: left;
+}
+
+.admin-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+  justify-content: start;
+  margin: 0;
+}
+
+/* 제어 버튼 그룹 스타일링 */
+.admin-grid .section .grid.grid-4.compact {
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.admin-grid .section .grid.grid-3.compact {
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.admin-grid .section .grid.grid-2.compact {
+  gap: 8px;
+  margin: 12px 0;
+}
+
+/* 모든 관리자 버튼들 - 금색 통일 및 작은 사이즈 */
+#btnCreateBattle, #btnStart, #btnPause, #btnResume, #btnEnd, 
+#btnGenPlayerPassword, #btnGenSpectatorPassword {
+  padding: 8px 12px !important;
+  font-size: 12px !important;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1px solid var(--gold);
+  transition: all var(--transition-fast);
+  backdrop-filter: var(--blur-light);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  position: relative;
+  overflow: hidden;
+  min-height: 32px;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 100%) !important;
+  color: var(--deep-navy) !important;
+  box-shadow: 0 2px 8px rgba(212, 183, 126, 0.3) !important;
+}
+
+#btnCreateBattle:hover, #btnStart:hover, #btnPause:hover, #btnResume:hover, #btnEnd:hover,
+#btnGenPlayerPassword:hover, #btnGenSpectatorPassword:hover {
+  background: linear-gradient(135deg, var(--gold-bright) 0%, var(--gold-shimmer) 100%) !important;
+  box-shadow: 0 4px 12px rgba(212, 183, 126, 0.5) !important;
+  transform: translateY(-1px);
+  border-color: var(--gold-bright);
+}
+
+/* 버튼 비활성화 상태 */
+.admin-grid .section button:disabled {
+  background: rgba(120, 120, 120, 0.3) !important;
+  color: rgba(255, 255, 255, 0.4) !important;
+  box-shadow: none !important;
+  transform: none !important;
+  cursor: not-allowed;
+  border-color: rgba(120, 120, 120, 0.3) !important;
+}
+
+/* 전투 참가자 추가 버튼 */
+#btnAddPlayer {
+  padding: 10px 16px !important;
+  font-size: 14px !important;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 100%) !important;
+  color: var(--deep-navy) !important;
+  border: 1px solid var(--gold) !important;
+  box-shadow: 0 3px 10px rgba(212, 183, 126, 0.3) !important;
+}
+
+#btnAddPlayer:hover {
+  background: linear-gradient(135deg, var(--gold-bright) 0%, var(--gold-shimmer) 100%) !important;
+  box-shadow: 0 5px 15px rgba(212, 183, 126, 0.5) !important;
+  transform: translateY(-1px);
+}
+
+/* 비밀번호 표시 영역 개선 */
+.password-item {
+  background: var(--glass-2);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  padding: 12px;
+  margin: 6px 0;
+  backdrop-filter: var(--blur-light);
+}
+
+.password-code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gold-bright);
+  background: rgba(212, 183, 126, 0.1);
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: inline-block;
+  margin-bottom: 6px;
+}
+
+.password-code:hover {
+  background: rgba(212, 183, 126, 0.2);
+  transform: scale(1.02);
+}
+
+.password-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.password-usage {
+  color: var(--success);
+  font-weight: 500;
+}
+
+.password-expires {
+  color: var(--warning);
+}
+
+/* 링크 표시 영역 */
+.link-display {
+  background: var(--glass-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  padding: 12px;
+  margin: 12px 0;
+}
+
+.link-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 8px 0;
+}
+
+.link-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.link-value, .password-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text);
+  background: rgba(0, 8, 13, 0.6);
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid var(--border-light);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.link-value:hover, .password-value:hover {
+  background: rgba(0, 8, 13, 0.8);
+  border-color: var(--gold);
+}
+
+/* 전투 ID 표시 */
+.battle-id {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gold-bright);
+  background: var(--glass-2);
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  border: 2px solid var(--border-gold);
+  text-align: center;
+  min-width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 스탯 정보 표시 */
+.stat-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--glass-2);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-light);
+}
+
+.stat-info .label {
+  font-size: 12px;
+  color: var(--text-accent);
+  font-weight: 600;
+}
+
+/* 비밀번호 정보 표시 개선 */
+.password-info, .link-info {
+  margin: 4px 0;
+  font-size: 11px;
+}
+
+.password-label, .link-label {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.password-code {
+  background: rgba(212, 183, 126, 0.15);
+  color: var(--gold-bright);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: 'JetBrains Mono', monospace;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.password-code:hover {
+  background: rgba(212, 183, 126, 0.25);
+}
+
+.spectator-password-info {
+  background: var(--glass-2);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  padding: 8px;
+}
+
+.usage-info {
+  font-size: 10px;
+  color: var(--success);
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+/* 로그 채팅 개선 */
+.log-entry.chat {
+  background: rgba(150, 255, 200, 0.1);
+  color: #96ffc8;
+}
+
+.player-link a {
+  color: var(--text);
+  text-decoration: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  word-break: break-all;
+}
+
+.player-link a:hover {
+  color: var(--gold-bright);
+}
+
+.stat-input {
+  text-align: center;
+  font-weight: 600;
+}
+
+/* 아바타 업로드 */
+.avatar-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.avatar-preview {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--gold);
+  background: var(--glass-2);
+}
+
+.avatar-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* 팀 로스터 */
+.roster-team {
+  background: var(--glass-1);
+  border-radius: var(--radius);
+  padding: 12px;
+  border: 1px solid var(--border-subtle);
+}
+
+.roster-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.player-card {
+  background: var(--glass-2);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  padding: 10px;
+  transition: all var(--transition-fast);
+}
+
+.player-card:hover {
+  border-color: var(--gold);
+  box-shadow: 0 2px 8px rgba(212, 183, 126, 0.2);
+}
+
+.player-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.player-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.player-hp {
+  flex: 1;
+  margin-left: 12px;
+}
+
+.hp-bar {
+  position: relative;
+  width: 100%;
+  height: 16px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+}
+
+.hp-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 10px;
+  font-weight: 600;
+  color: white;
+  z-index: 2;
+}
+
+.hp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--success) 0%, #2ecc71 100%);
+  transition: width 0.3s ease;
+}
+
+.player-stats {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.stat-value {
+  background: var(--gold-subtle);
+  color: var(--navy-light);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.items {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.item {
+  background: var(--gold-subtle);
+  color: var(--navy-light);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.remove-player-btn {
+  background: var(--danger);
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  margin-top: 6px;
+}
+
+.remove-player-btn:hover {
+  background: #c0392b;
+  transform: scale(1.05);
+}
+
+/* 팀 제목 - 둘 다 금색으로 통일 */
+.team-title.phoenix {
+  color: var(--gold-bright);
+  font-size: 16px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.team-title.eaters {
+  color: var(--gold-bright);
+  font-size: 16px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+/* 섹션 제목들 */
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gold-bright);
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--border-light);
+  padding-bottom: 6px;
+}
+
+.section-subtitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-accent);
+  margin-bottom: 8px;
+}
+
+/* 카드 제목 */
+.card .title {
+  font-size: 18px;
+  color: var(--gold-bright);
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+/* 정보 그리드 */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.info-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.info-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* 로그 피드 */
+.log-feed {
+  background: var(--glass-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  padding: 8px;
+  height: 200px;
+  overflow-y: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+}
+
+.log-entry {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 4px;
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+.log-entry.system {
+  background: rgba(100, 150, 255, 0.1);
+  color: #64a6ff;
+}
+
+.log-entry.battle {
+  background: rgba(255, 150, 100, 0.1);
+  color: #ff9664;
+}
+
+.log-entry.cheer {
+  background: rgba(150, 255, 150, 0.1);
+  color: #96ff96;
+}
+
+.log-time {
+  color: var(--text-muted);
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.log-text {
+  color: inherit;
+}
+
+/* 채팅 피드 */
+.chat-feed {
+  background: var(--glass-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  padding: 8px;
+  height: 150px;
+  overflow-y: auto;
+  margin-bottom: 8px;
+}
+
+.chat-message {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 4px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-size: 12px;
+}
+
+.chat-name {
+  font-weight: 600;
+  color: var(--gold-bright);
+  min-width: 60px;
+}
+
+.chat-text {
+  color: var(--text);
+  flex: 1;
+}
+
+.chat-time {
+  color: var(--text-muted);
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.chat-input-area {
+  display: flex;
+  gap: 8px;
+}
+
+.chat-input-area .input {
+  flex: 1;
+}
+
+.chat-input-area .btn-secondary {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+/* 토스트 알림 */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toast {
+  background: var(--glass-2);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  min-width: 250px;
+  backdrop-filter: var(--blur-light);
+  font-size: 14px;
+  font-weight: 500;
+  transform: translateX(100%);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.toast.show {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.toast-success {
+  border-color: var(--success);
+  color: var(--success);
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.toast-error {
+  border-color: var(--danger);
+  color: var(--danger);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.toast-warning {
+  border-color: var(--warning);
+  color: var(--warning);
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.toast-info {
+  border-color: var(--info);
+  color: var(--info);
+  background: rgba(59, 130, 246, 0.1);
+}
+
+/* 전투 참가자 링크 표시 */
+.player-link {
+  background: var(--glass-2);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  padding: 8px;
+  margin: 4px 0;
+  font-size: 11px;
+}
+
+.player-link strong {
+  color: var(--gold-bright);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.player-link a {
+  color: var(--text);
+  text-decoration: none;
+  font-family: 'JetBrains Mono', monospace;
+  word-break: break-all;
+}
+
+.player-link a:hover {
+  color: var(--gold-bright);
+}
+
+/* 반응형 개선 */
+@media (max-width: 1200px) {
+  .admin-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-container {
+    padding: 16px;
+  }
+  
+  .admin-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .grid.grid-4.compact {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .grid.grid-3.compact {
+    grid-template-columns: 1fr;
+  }
+  
+  .player-header {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .stat-value {
+    font-size: 18px;
+  }
+
+  /* 모바일에서 버튼 더 작게 */
+  #btnCreateBattle, #btnStart, #btnPause, #btnResume, #btnEnd, 
+  #btnGenPlayerPassword, #btnGenSpectatorPassword {
+    padding: 6px 10px !important;
+    font-size: 11px !important;
+    min-height: 28px;
+  }
+
+  .info-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
