@@ -1,5 +1,3 @@
-// PYXIS 배틀 시스템 - 관리자 페이지
-// (오탈자/중복/문법만 정리하여 보수, 기존 로직/흐름 유지)
 (function () {
   'use strict';
 
@@ -15,7 +13,6 @@
   function initSocket() {
     if (socket && connected) return socket;
 
-    // ✅ 클라이언트 초기화 방식 보수: 경로는 path 옵션으로 지정
     socket = io({
       path: '/socket.io',
       transports: ['websocket', 'polling'],
