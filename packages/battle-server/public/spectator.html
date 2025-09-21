@@ -3,20 +3,21 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>PYXIS - 관전자</title>
+<title>남겨진 유산 - 관전자</title>
 <script src="/socket.io/socket.io.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg1:#0e0e0e; --bg2:#141414;
     --glass-1:rgba(0,0,0,.7); --glass-2:rgba(0,0,0,.5);
-    --border:rgba(220,199,162,.3);
+    /* gold 계열을 #CDCDCD로 통일 */
+    --border:rgba(205,205,205,.3);
     --text:#F8F9FA; --muted:#A9AFB6;
-    --gold:#DCC7A2; --gold2:#E6D2A8;
+    --gold:#CDCDCD; --gold2:#CDCDCD;
     --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444;
     --shadow:0 10px 30px rgba(0,0,0,.45);
     --team-a-color:#8b5757; --team-b-color:#5d6b8d;
-    --result-bg:#DCC7A2; --result-text:#000;
+    --result-bg:#CDCDCD; --result-text:#000;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{background:linear-gradient(135deg,#000813,#001122);color:var(--text);font-family:system-ui,-apple-system,sans-serif;min-height:100vh;padding:8px}
@@ -82,7 +83,7 @@
 </head>
 <body>
 <div class="container">
-  <div class="header">PYXIS 전투 시스템</div>
+  <div class="header">남겨진 유산 전투 시스템</div>
 
   <div class="main-grid">
     <div>
