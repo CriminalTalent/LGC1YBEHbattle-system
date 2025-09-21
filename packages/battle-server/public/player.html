@@ -3,20 +3,21 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>PYXIS - 전투 참가자</title>
+<title>남겨진 유산 - 전투 참가자</title>
 <script src="/socket.io/socket.io.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg1:#0e0e0e; --bg2:#141414;
     --glass-1:rgba(0,0,0,.7); --glass-2:rgba(0,0,0,.5);
-    --border:rgba(220,199,162,.3);
+    /* 골드 계열을 #CDCDCD로 통일 */
+    --border:rgba(205,205,205,.3);
     --text:#F8F9FA; --muted:#A9AFB6;
-    --gold:#DCC7A2; --gold2:#E6D2A8;
+    --gold:#CDCDCD; --gold2:#CDCDCD;
     --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444;
     --shadow:0 10px 30px rgba(0,0,0,.45);
     --team-a-color:#8b5757;  --team-b-color:#5d6b8d;
-    --result-bg:#DCC7A2; --result-text:#000;
+    --result-bg:#CDCDCD; --result-text:#000;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{background:linear-gradient(135deg,#000813,#001122);color:var(--text);font-family:system-ui,-apple-system,sans-serif;min-height:100vh;padding:8px}
@@ -110,7 +111,7 @@
 </head>
 <body>
 <div class="container">
-  <div class="header">PYXIS 전투 시스템</div>
+  <div class="header">남겨진 유산 전투 시스템</div>
 
   <div class="main-grid">
     <div>
@@ -208,7 +209,6 @@
   let hasActedThisTurn = false;
   let selectedAction = null;
 
-  /* ★ 로컬 타이머 상태 (스냅샷 동기화 + 초단위 감소) */
   const timer = { baseLeft:0, baseTs:0, h:null };
   function syncTimerFromSnap(snap){
     const left = Math.max(0, (snap?.currentTurn?.timeLeftSec|0));
@@ -216,13 +216,11 @@
     timer.baseTs = Date.now();
     if (!timer.h) {
       timer.h = setInterval(()=>{
-        // 경과 초
         const elapsed = Math.floor((Date.now() - timer.baseTs)/1000);
         const remain = Math.max(0, timer.baseLeft - elapsed);
         renderTimer(remain);
       }, 1000);
     }
-    // 즉시 1회 표시도 업데이트
     renderTimer(left);
   }
   function renderTimer(sec){
@@ -325,7 +323,6 @@
       document.getElementById(id).disabled = !canAct;
     });
 
-    // ★ 스냅샷으로 타이머 동기화 (초단위 로컬 감소)
     syncTimerFromSnap(battleState);
   }
 
@@ -480,7 +477,6 @@
     hasActedThisTurn = false;
     renderAll();
 
-    // 전투 종료 시 오버레이 & 타이머 정지
     if (battleState?.status === 'ended') {
       if (!gameOverEl.classList.contains('show')) {
         gameOverEl.classList.add('show');
@@ -497,7 +493,6 @@
   socket.on('actionSuccess', ()=>{ hasActedThisTurn = true; ['attackBtn','defendBtn','dodgeBtn','itemBtn','passBtn'].forEach(id=>document.getElementById(id).disabled=true); });
   socket.on('player:action:success', ()=>{ hasActedThisTurn = true; ['attackBtn','defendBtn','dodgeBtn','itemBtn','passBtn'].forEach(id=>document.getElementById(id).disabled=true); });
 
-  // 서버에서 종료 알림이 따로 와도 잠금
   function showGameOver(){ if(!gameOverEl.classList.contains('show')){ gameOverEl.classList.add('show'); document.body.style.overflow='hidden'; } stopTimer(); }
   socket.on('battle:ended', showGameOver);
   socket.on('battleEnded',  showGameOver);
