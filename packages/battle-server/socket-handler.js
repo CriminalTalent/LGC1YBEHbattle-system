@@ -1,4 +1,3 @@
-// PYXIS 배틀 시스템 - 소켓 핸들러 (중복 방지)
 const BattleEngine = require('./battle-engine');
 
 class SocketHandler {
