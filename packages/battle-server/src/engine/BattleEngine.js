@@ -299,9 +299,10 @@ export function createBattleStore() {
     const second = first==='A' ? 'B' : 'A';
 
     const allIntents = [...(b.choices.A||[]), ...(b.choices.B||[])];
-    const defBoost = new Set(); // 방어 보정기 적용자(해당 라운드 방어×2)
 
-    // 아이템 선처리: 소비 + 적용
+    // === 1) 아이템 선처리: 회복/방어만 '우선 적용', 공격보정기는 '공격 페이즈'로 이월 ===
+    const defBoost = new Set();            // 방어 보정기 적용자(해당 라운드 방어×2)
+    const atkBoostMap = new Map();         // playerId -> { targetId }
     for (const it of allIntents) {
       if (it.type !== 'item') continue;
       const actor = b.players.find(p=>p.id===it.playerId);
@@ -334,23 +335,28 @@ export function createBattleStore() {
           pushLog(b, `→ ${actor.name}이(가) 방어 보정기 사용 실패(재고 없음)`, 'result');
         }
       } else if (kind==='attackBooster') {
+        // 공격은 '공격 페이즈'에서 처리되도록 큐에 적재 (아이템은 즉시 소모)
         if ((actor.items.attackBooster ?? 0) > 0) {
           actor.items.attackBooster -= 1;
           const tgt = it.raw?.targetId ? (b.players.find(p=>p.id===it.raw.targetId) || null) : null;
-          if (tgt && tgt.hp>0) {
-            resolveSingleAttack(b, actor, tgt, /*useAtkBoost*/true, defBoost, allIntents);
-          } else {
-            pushLog(b, `→ ${actor.name}이(가) 공격 보정기 사용(대상 부재)`, 'result');
-          }
+          atkBoostMap.set(actor.id, { targetId: tgt?.id || null });
+          pushLog(b, `→ ${actor.name}이(가) 공격 보정기 사용 — 강화공격 대기`, 'result');
         } else {
           pushLog(b, `→ ${actor.name}이(가) 공격 보정기 사용 실패(재고 없음)`, 'result');
         }
       }
     }
 
-    // 선/후 팀 순으로 의도 실행
-    resolveTeamByOrder(b, first,  defBoost, allIntents);
-    resolveTeamByOrder(b, second, defBoost, allIntents);
+    // === 2) 비피해 행동(방어/회피) 먼저 확정 로그 ===
+    resolveTeamNonDamage(b, first,  allIntents);
+    resolveTeamNonDamage(b, second, allIntents);
+
+    // === 3) 공격 페이즈: (a) 강화공격(보정기) → (b) 일반 공격, 둘 다 팀/이니시 순 ===
+    resolveTeamBoostedAttacks(b, first,  atkBoostMap, defBoost, allIntents);
+    resolveTeamBoostedAttacks(b, second, atkBoostMap, defBoost, allIntents);
+
+    resolveTeamNormalAttacks(b, first,  defBoost, allIntents);
+    resolveTeamNormalAttacks(b, second, defBoost, allIntents);
 
     // 라운드 종료/판정
     pushLog(b, `=== ${b.round}라운드 종료 ===`, 'result');
@@ -383,7 +389,67 @@ export function createBattleStore() {
     }, 50);
   }
 
-  // 단일 공격 처리: 회피/방어는 '의도했을 때만' 적용
+  // === 비피해 행동(방어/회피) 로그만 확정 ===
+  function resolveTeamNonDamage(b, team, allIntents) {
+    const intents = (b.choices[team] || []).filter(x => x.type==='defend' || x.type==='dodge');
+    if (!intents.length) return;
+    const order = sortByInitiative(
+      intents.map(c => b.players.find(p=>p.id===c.playerId)).filter(Boolean)
+    ).map(p=>p.id);
+
+    for (const pid of order) {
+      const intent = intents.find(c=>c.playerId===pid);
+      const actor = b.players.find(p=>p.id===pid);
+      if (!intent || !actor || actor.hp<=0) continue;
+      if (intent.type==='defend') pushLog(b, `→ ${actor.name}이(가) 방어 태세`, 'result');
+      if (intent.type==='dodge')  pushLog(b, `→ ${actor.name}이(가) 회피 태세`, 'result');
+    }
+  }
+
+  // === 강화공격(공격 보정기) 먼저 처리 ===
+  function resolveTeamBoostedAttacks(b, team, atkBoostMap, defBoostSet, allIntents) {
+    const intents = (b.choices[team] || []);
+    const boostedActors = intents
+      .map(c => b.players.find(p=>p.id===c.playerId))
+      .filter(p => p && atkBoostMap.has(p.id) && p.hp>0);
+
+    if (!boostedActors.length) return;
+
+    const order = sortByInitiative(boostedActors).map(p=>p.id);
+    for (const pid of order) {
+      const actor = b.players.find(p=>p.id===pid);
+      const targetId = atkBoostMap.get(pid)?.targetId || null;
+      const tgt = targetId ? b.players.find(p=>p.id===targetId) : null;
+      if (!actor || actor.hp<=0) continue;
+      if (!tgt || tgt.hp<=0) continue;
+      resolveSingleAttack(b, actor, tgt, /*useAtkBoost*/true, defBoostSet, allIntents);
+    }
+    // 한 라운드 사용 종료
+    order.forEach(pid => atkBoostMap.delete(pid));
+  }
+
+  // === 일반 공격 처리 ===
+  function resolveTeamNormalAttacks(b, team, defBoostSet, allIntents) {
+    const intents = (b.choices[team] || []).filter(x => x.type==='attack');
+    if (!intents.length) return;
+
+    const order = sortByInitiative(
+      intents.map(c => b.players.find(p=>p.id===c.playerId)).filter(Boolean)
+    ).map(p=>p.id);
+
+    for (const pid of order) {
+      const intent = intents.find(c=>c.playerId===pid);
+      const actor  = b.players.find(p=>p.id===pid);
+      if (!intent || !actor || actor.hp<=0) continue;
+      const tgt = intent.targetId ? b.players.find(p=>p.id===intent.targetId) : null;
+      if (tgt && tgt.hp>0) resolveSingleAttack(b, actor, tgt, /*useAtkBoost*/false, defBoostSet, allIntents);
+    }
+    // 소모
+    const arr = b.choices[team] || [];
+    b.choices[team] = arr.filter(x => x.type!=='attack');
+  }
+
+  // 단일 공격 처리: 회피/방어는 '의도했을 때만' 적용 + 치명타 상한 10%
   function resolveSingleAttack(b, actor, target, useAtkBoost, defBoostSet, allIntents) {
     if (!actor || !target || actor.hp<=0 || target.hp<=0) return;
 
@@ -400,8 +466,7 @@ export function createBattleStore() {
       }
     }
 
-    // ★ 치명타: 행운에 비례하되 최대 10%
-    // luck 0→0%, 1→2%, 2→4%, ... 5+ → 10% (상한)
+    // 치명타: 행운 기반 최대 10%
     const luck = (actor.stats?.luck ?? 0);
     const critChance = Math.min(0.10, Math.max(0, luck) * 0.02);
     const crit = Math.random() < critChance;
@@ -419,38 +484,6 @@ export function createBattleStore() {
 
     target.hp = clamp(target.hp - damage, 0, target.maxHp);
     pushLog(b, `→ ${actor.name}이(가) ${target.name}에게 ${crit ? '치명타 ' : ''}공격 (피해 ${damage}) → HP ${target.hp}`, 'result');
-  }
-
-  // 팀 해석(이니시 순) – attack/defend/dodge/pass
-  function resolveTeamByOrder(b, team, defBoostSet, allIntents) {
-    const intents = (b.choices[team] || []).slice();
-    if (!intents.length) return;
-
-    const order = sortByInitiative(
-      intents.map(c => b.players.find(p=>p.id===c.playerId)).filter(Boolean)
-    ).map(p=>p.id);
-
-    for (const pid of order) {
-      const intent = intents.find(c=>c.playerId===pid);
-      if (!intent) continue;
-
-      const actor = b.players.find(p=>p.id===pid);
-      if (!actor || actor.hp<=0) continue;
-
-      if (intent.type==='attack') {
-        const tgt = intent.targetId ? b.players.find(p=>p.id===intent.targetId) : null;
-        if (tgt && tgt.hp>0) resolveSingleAttack(b, actor, tgt, /*useAtkBoost*/false, defBoostSet, allIntents);
-      } else if (intent.type==='defend') {
-        pushLog(b, `→ ${actor.name}이(가) 방어 태세`, 'result');
-      } else if (intent.type==='dodge') {
-        pushLog(b, `→ ${actor.name}이(가) 회피 태세`, 'result');
-      } else if (intent.type==='item') {
-        // 아이템은 이미 위에서 처리/소비됨
-      } else if (intent.type==='pass') {
-        pushLog(b, `→ ${actor.name}이(가) 행동을 생략`, 'result');
-      }
-    }
-    b.choices[team] = [];
   }
 
   // 1시간 종료 시 HP 합산 승부
