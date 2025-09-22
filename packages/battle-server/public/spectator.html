@@ -10,14 +10,13 @@
   :root{
     --bg1:#0e0e0e; --bg2:#141414;
     --glass-1:rgba(0,0,0,.7); --glass-2:rgba(0,0,0,.5);
-    /* gold 계열을 #CDCDCD로 통일 */
-    --border:rgba(205,205,205,.3);
+    --border:rgba(220,199,162,.3);
     --text:#F8F9FA; --muted:#A9AFB6;
-    --gold:#CDCDCD; --gold2:#CDCDCD;
+    --gold:#CDCDCD; --gold2:#CDCDCD; /* ← 변경 */
     --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444;
     --shadow:0 10px 30px rgba(0,0,0,.45);
     --team-a-color:#8b5757; --team-b-color:#5d6b8d;
-    --result-bg:#CDCDCD; --result-text:#000;
+    --result-bg:#DCC7A2; --result-text:#000;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{background:linear-gradient(135deg,#000813,#001122);color:var(--text);font-family:system-ui,-apple-system,sans-serif;min-height:100vh;padding:8px}
@@ -44,16 +43,25 @@
 
   .battle-main{text-align:center}
   .current-player-info{background:var(--glass-2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:12px}
-  .current-avatar{width:100%;max-width:420px;height:420px;margin:0 auto 12px auto;display:block;object-fit:cover;border:4px solid var(--gold);border-radius:16px;background:#000}
+  .current-avatar{
+    width:100%; max-width:420px; height:420px; margin:0 auto 12px auto;
+    display:block; object-fit:cover; border:4px solid var(--gold); border-radius:16px; background:#000;
+  }
   .turn-info{font-size:16px;margin-bottom:8px;color:var(--text);font-weight:600}
   .timer-display{color:var(--gold);font-size:32px;margin-bottom:8px;font-weight:700}
   .timer-seconds{font-size:14px;color:var(--muted);margin-bottom:16px}
 
   .cheer-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-  .cheer-btn{background:transparent;color:var(--gold);border:2px solid var(--gold);padding:10px 6px;border-radius:8px;font-size:12px;cursor:pointer;transition:all .2s;font-weight:700}
+  .cheer-btn{
+    background:transparent;color:var(--gold);border:2px solid var(--gold);
+    padding:10px 6px;border-radius:8px;font-size:12px;cursor:pointer;transition:all .2s;font-weight:700
+  }
   .cheer-btn:hover{background:var(--gold);color:#000}
 
-  .logs-section,.chat-section{height:400px;overflow-y:auto;background:var(--glass-2);border:1px solid var(--border);padding:8px;border-radius:8px;margin-bottom:8px}
+  .logs-section, .chat-section{
+    height:400px;overflow-y:auto;background:var(--glass-2);
+    border:1px solid var(--border);padding:8px;border-radius:8px;margin-bottom:8px
+  }
   .log-item{margin-bottom:4px;font-size:11px;line-height:1.4;padding:2px 4px;border-radius:4px}
   .log-time{color:var(--muted)}
   .chat-item{margin-bottom:4px;font-size:11px}
@@ -72,18 +80,23 @@
   .enter-btn{background:var(--gold);color:#000;border:none;padding:10px 16px;border-radius:8px;font-size:13px;cursor:pointer;font-weight:700;width:100%}
   .enter-btn:hover{background:var(--gold2)}
 
-  /* 전투 종료 오버레이 */
-  .gameover-overlay{position:fixed;inset:0;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;z-index:9999;opacity:0;visibility:hidden;transition:opacity .25s ease, visibility .25s ease;pointer-events:none}
-  .gameover-overlay.show{opacity:1;visibility:visible;pointer-events:auto}
-  .gameover-box{ text-align:center;background:var(--glass-1);border:2px solid var(--gold);border-radius:16px;padding:28px 32px;box-shadow:var(--shadow) }
-  .gameover-title{ font-family:Cinzel,serif;color:var(--gold);font-size:24px;letter-spacing:.06em }
+  /* 게임 종료 오버레이 */
+  .game-over-overlay{position:fixed;inset:0;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;z-index:9999;opacity:0;visibility:hidden;transition:all .25s}
+  .game-over-overlay.show{opacity:1;visibility:visible}
+  .game-over-box{background:var(--glass-1);border:2px solid var(--gold);border-radius:16px;padding:28px;text-align:center;max-width:420px;width:92%}
+  .game-over-title{font-family:Cinzel,serif;color:var(--gold);font-size:24px;margin-bottom:8px}
+  .game-over-winner{color:var(--gold);font-size:18px;font-weight:700}
 
-  @media (max-width:767px){ .main-grid{grid-template-columns:1fr} .cheer-grid{grid-template-columns:1fr} .current-avatar{height:360px} }
+  @media (max-width:767px){
+    .main-grid{grid-template-columns:1fr}
+    .cheer-grid{grid-template-columns:1fr}
+    .current-avatar{height:360px}
+  }
 </style>
 </head>
 <body>
 <div class="container">
-  <div class="header">남겨진 유산 전투 시스템</div>
+  <div class="header">남겨진 유산</div> <!-- ← 변경 -->
 
   <div class="main-grid">
     <div>
@@ -91,6 +104,7 @@
         <div class="team-title">A팀</div>
         <div id="teamA"></div>
       </div>
+
       <div class="card">
         <div class="title">실시간 로그</div>
         <div class="logs-section" id="logPanel"></div>
@@ -102,8 +116,8 @@
         <div class="current-player-info">
           <img id="currentPortrait" class="current-avatar" alt="현재 플레이어" onerror="this.style.background='#000';this.removeAttribute('src')"/>
           <div id="turnInfo" class="turn-info">대기 중...</div>
-          <div id="timerDisplay" class="timer-display">5:00</div>
-          <div id="timerSeconds" class="timer-seconds">300초</div>
+          <div id="timerDisplay" class="timer-display">0:00</div>
+          <div id="timerSeconds" class="timer-seconds">0초</div>
         </div>
       </div>
 
@@ -125,6 +139,7 @@
         <div class="team-title">B팀</div>
         <div id="teamB"></div>
       </div>
+
       <div class="card">
         <div class="title">채팅</div>
         <div class="chat-section" id="chatPanel"></div>
@@ -141,52 +156,44 @@
   </div>
 </div>
 
-<!-- 전투 종료 오버레이 -->
-<div id="gameOver" class="gameover-overlay" aria-hidden="true">
-  <div class="gameover-box"><div class="gameover-title">전투가 종료되었습니다.</div></div>
+<!-- 게임 종료 오버레이 -->
+<div id="gameOver" class="game-over-overlay" aria-hidden="true">
+  <div class="game-over-box">
+    <div class="game-over-title">전투가 종료되었습니다.</div>
+    <div class="game-over-winner" id="winnerText"></div>
+  </div>
 </div>
 
 <script>
 (()=> {
+  // battle 파라미터 호환(battle|battleId|bid)
   const qs = new URLSearchParams(location.search);
   const battleId = qs.get('battle') || qs.get('battleId') || qs.get('bid');
   if (!battleId) { alert('올바르지 않은 URL입니다'); return; }
-  try{ const u=new URL(location.href); u.searchParams.set('battle',battleId); ['battleId','bid'].forEach(k=>u.searchParams.delete(k)); history.replaceState(null,'',u.toString()); }catch{}
+  try{
+    const u=new URL(location.href);
+    u.searchParams.set('battle',battleId);
+    ['battleId','bid'].forEach(k=>u.searchParams.delete(k));
+    history.replaceState(null,'',u.toString());
+  }catch{}
 
   const socket = io();
   const logPanel  = document.getElementById('logPanel');
   const chatPanel = document.getElementById('chatPanel');
-  const gameOverEl= document.getElementById('gameOver');
 
   let spectatorName = '';
   let battle = null;
   let currentPhase = null;
   const bufferedResolutionLogs = [];
 
-  /* ★ 로컬 타이머 상태 (스냅샷 동기화 + 초단위 감소) */
-  const timer = { baseLeft:0, baseTs:0, h:null };
-  function syncTimerFromSnap(snap){
-    const left = Math.max(0, (snap?.currentTurn?.timeLeftSec|0));
-    timer.baseLeft = left;
-    timer.baseTs = Date.now();
-    if (!timer.h) {
-      timer.h = setInterval(()=>{
-        const elapsed = Math.floor((Date.now() - timer.baseTs)/1000);
-        const remain = Math.max(0, timer.baseLeft - elapsed);
-        renderTimer(remain);
-      }, 1000);
-    }
-    renderTimer(left);
-  }
-  function renderTimer(sec){
-    const mm = Math.floor(sec/60);
-    const ss = String(sec%60).padStart(2,'0');
-    document.getElementById('timerDisplay').textContent = `${mm}:${ss}`;
-    document.getElementById('timerSeconds').textContent = `${sec}초`;
-  }
-  function stopTimer(){ if(timer.h){ clearInterval(timer.h); timer.h=null; } }
+  let timerDisplayLeft = 0;
+  let timerTick = null;
+
+  let lastWinnerTeam = null;
+  let gameOverShown = false;
 
   const esc = s => s ? s.replace(/</g,'&lt;').replace(/>/g,'&gt;') : '';
+
   function classForLog(type, message){
     if (type === 'teamA') return 'log-team-a';
     if (type === 'teamB') return 'log-team-b';
@@ -200,12 +207,14 @@
     if (/라운드 해석|승리|결과|===/.test(m)) return 'log-result';
     return 'log-system';
   }
+
   function stripDetail(msg){
     return msg
       .replace(/\s*\(피해\s*[\d]+\)\s*→\s*HP\s*[\d]+/g,'')
       .replace(/\s*\(회복\s*[\d]+\)\s*→\s*HP\s*[\d]+/g,'')
       .replace(/\s*→\s*HP\s*[\d]+/g,'');
   }
+
   function pushLog(text, cls='log-system', ts){
     const time = new Date(ts||Date.now()).toLocaleTimeString('ko-KR',{hour12:false});
     const div = document.createElement('div');
@@ -213,12 +222,22 @@
     div.innerHTML = `<span class="log-time">[${time}]</span> ${esc(text)}`;
     logPanel.appendChild(div);
     logPanel.scrollTop = logPanel.scrollHeight;
+    while (logPanel.children.length > 700) logPanel.removeChild(logPanel.firstChild);
   }
+
   function addLog({ts, type, message}){
     if (!message) return;
+
+    // 승자 문구 감지하여 저장(fallback)
+    if (/([AB])팀\s*승리/.test(message)) {
+      const m = message.match(/([AB])팀\s*승리/);
+      if (m) lastWinnerTeam = m[1];
+    }
+
     const phase = battle?.phase || currentPhase;
     const isSelect = (phase === 'A_select' || phase === 'B_select');
     const hasDetail = /(피해\s*\d+|회복\s*\d+|→\s*HP\s*\d+)/.test(message);
+
     if (isSelect && hasDetail) {
       pushLog(stripDetail(message), classForLog(type, message), ts);
       bufferedResolutionLogs.push({ ts, text: message });
@@ -232,6 +251,7 @@
     }
     pushLog(message, classForLog(type, message), ts);
   }
+
   function addChat({name, message}){
     if (!name || !message) return;
     const div = document.createElement('div');
@@ -270,16 +290,41 @@
     render(teamB,'teamB');
   }
 
+  /* 타이머(1초 감산, inter는 최소 5초 보장) */
+  function startLocalTimer(seconds){
+    clearInterval(timerTick);
+    const phase = battle?.phase;
+    let startSec = Math.max(0, seconds|0);
+    if (phase === 'inter' && startSec < 5) startSec = 5;
+
+    timerDisplayLeft = startSec;
+    drawTimer(timerDisplayLeft);
+    timerTick = setInterval(()=>{
+      if (timerDisplayLeft > 0) {
+        timerDisplayLeft -= 1;
+        drawTimer(timerDisplayLeft);
+      }
+    }, 1000);
+  }
+  function drawTimer(t){
+    const mm = Math.floor(t/60);
+    const ss = String(t%60).padStart(2,'0');
+    document.getElementById('timerDisplay').textContent = `${mm}:${ss}`;
+    document.getElementById('timerSeconds').textContent = `${t}초`;
+  }
+
   function renderCenter(){
     const turn = battle?.currentTurn || {};
     const current = turn.currentPlayer;
     const img = document.getElementById('currentPortrait');
     const info = document.getElementById('turnInfo');
+
     const phaseText =
       battle?.phase === 'A_select' ? 'A팀 선택 중' :
       battle?.phase === 'B_select' ? 'B팀 선택 중' :
       battle?.phase === 'resolve'  ? '라운드 해석 중' :
       battle?.phase === 'inter'    ? '다음 라운드 대기' : '대기중';
+
     if (current && current.name) {
       info.textContent = `${phaseText} - ${current.name} 차례`;
       if (current.avatar) { img.src = current.avatar; img.style.background='#000'; }
@@ -288,8 +333,8 @@
       info.textContent = phaseText;
       img.removeAttribute('src'); img.style.background='#000';
     }
-    // ★ 타이머 동기화
-    syncTimerFromSnap(battle);
+
+    startLocalTimer(turn.timeLeftSec||0);
   }
 
   function renderAll(){
@@ -303,9 +348,7 @@
     }
     renderCenter();
     renderTeams();
-
-    // 종료 스냅샷으로 감지
-    if (battle?.status === 'ended') showGameOver();
+    maybeShowGameOverByStatus();
   }
 
   // 이름 입력 → 채팅용
@@ -319,7 +362,7 @@
     if(e.key==='Enter'){ e.preventDefault(); document.getElementById('enterBtn').click(); }
   });
 
-  // 응원 버튼 → 일반 채팅으로 송출
+  // 응원 버튼 → 일반 채팅으로 송출(중복 제거 없이 계속 보이게)
   document.addEventListener('click',(e)=>{
     const b=e.target.closest('.cheer-btn');
     if(!b) return;
@@ -327,19 +370,31 @@
     socket.emit('chatMessage',{battleId,name:spectatorName||'관전자',message:msg,type:'cheer'});
   });
 
-  // 종료 표시
-  function showGameOver(){ if(!gameOverEl.classList.contains('show')){ gameOverEl.classList.add('show'); document.body.style.overflow='hidden'; } stopTimer(); }
-
   // 소켓
   socket.on('connect', ()=>{ socket.emit('join',{battleId}); });
   const onSnap = (snap)=>{ battle=snap; renderAll(); };
   socket.on('battle:update', onSnap);
   socket.on('battle:log', addLog);
   socket.on('chatMessage', addChat);
-  socket.on('battle:ended', showGameOver);
-  socket.on('battleEnded',  showGameOver);
 
-  window.addEventListener('beforeunload', ()=>{ stopTimer(); socket.disconnect(); });
+  // === 종료 오버레이 표시 ===
+  function showGameOverOverlay(winnerTeam){
+    if (gameOverShown) return;
+    gameOverShown = true;
+    const ov = document.getElementById('gameOver');
+    const wt = document.getElementById('winnerText');
+    wt.textContent = winnerTeam ? `${winnerTeam}팀 승리` : '';
+    ov.classList.add('show');
+  }
+  socket.on('battle:ended', (d)=> showGameOverOverlay(d?.winner));
+  socket.on('battleEnded',  (d)=> showGameOverOverlay(d?.winner));
+
+  function maybeShowGameOverByStatus(){
+    if (!battle) return;
+    if (battle.status === 'ended') {
+      showGameOverOverlay(lastWinnerTeam);
+    }
+  }
 
   document.getElementById('nameInput').focus();
 })();
