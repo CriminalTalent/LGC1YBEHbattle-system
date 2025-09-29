@@ -27,8 +27,8 @@ const RESOLVE_WINDOW_MS = 3_000;         // 3초
 const d10 = () => 1 + Math.floor(Math.random() * 10);
 const teamOf = (p) => (p?.team === 'B' ? 'B' : 'A');
 
-// ▼▼ 팀 표시 전용 라벨(표시만 바꿈, 내부값 A/B 유지)
-const teamLabel = (t) => (t === 'A' ? '불사조 기사단' : t === 'B' ? '죽음을 먹는자' : t);
+// ▼ 표시용 팀명(내부 키는 A/B 유지)
+const teamLabel = (t) => (t === 'A' ? '불사조 기사단' : t === 'B' ? '죽음을 먹는자' : String(t));
 
 function sortByInitiative(players) {
   return [...players].sort((a, b) => {
@@ -160,7 +160,6 @@ export function createBattleStore() {
 
     b.currentTeam = first; b.nextFirstTeam = first; b.selectionDone = { A: false, B: false };
 
-    // ▼ 표시만 변경
     pushLog(b, `선공 결정: ${teamLabel('A')}(민첩 ${Math.floor(avgA)} + ${rA} = ${sA}) vs ${teamLabel('B')}(민첩 ${Math.floor(avgB)} + ${rB} = ${sB})`, 'system');
     pushLog(b, `${teamLabel(first)}이(가) 선공입니다!`, 'system');
     pushLog(b, '전투가 시작되었습니다!', 'system');
@@ -182,7 +181,6 @@ export function createBattleStore() {
     b.phaseEndsAt = now() + TEAM_SELECT_MS;
     b.phaseToken  = randomUUID();
 
-    // ▼ 표시만 변경
     pushLog(b, `=== ${teamLabel(team)} 선택 페이즈 시작 ===`, team === 'A' ? 'teamA' : 'teamB');
     touch(b);
 
@@ -204,7 +202,7 @@ export function createBattleStore() {
           if (!chosenIds.has(id)) b.choices[team].push({ playerId: id, type: 'pass', targetId: null, raw: {} });
         }
         b.selectionDone[team] = true;
-        pushLog(b, `[${team}] 시간 초과 — 자동 진행(pass)`, team === 'A' ? 'teamA' : 'teamB');
+        pushLog(b, `[${teamLabel(team)}] 시간 초과 — 자동 진행(pass)`, team === 'A' ? 'teamA' : 'teamB');
         touch(b);
         finishSelectOrNext(b);
       }
@@ -264,8 +262,7 @@ export function createBattleStore() {
     const done = [...aliveIds].every(id => chosenIds.has(id));
     if (done && !b.selectionDone[team]) {
       b.selectionDone[team] = true;
-      // ▼ 표시만 변경(브래킷 표시는 유지)
-      pushLog(b, `[${team}] ${teamLabel(team)} 선택 완료`, team === 'A' ? 'teamA' : 'teamB');
+      pushLog(b, `[${teamLabel(team)}] ${teamLabel(team)} 선택 완료`, team === 'A' ? 'teamA' : 'teamB');
       touch(b);
       finishSelectOrNext(b);
     } else {
@@ -390,7 +387,6 @@ export function createBattleStore() {
       if (!bothAlive(b)) {
         const win = teamAlive(b, 'A') ? 'A' : teamAlive(b, 'B') ? 'B' : null;
         if (win) {
-          // ▼ 표시만 변경
           pushLog(b, `${teamLabel(win)} 승리!`, 'result');
           b.status = 'ended'; b.phase = 'idle'; b.turnCursor = null; b.phaseEndsAt = null; b.phaseToken = null;
           touch(b); return;
@@ -412,4 +408,131 @@ export function createBattleStore() {
           setTimeout(() => {
             if (b.status !== 'active') return;
             pushLog(b, `${b.round}라운드 시작`, 'system');
-           
+            startSelectPhase(b, b.nextFirstTeam);
+          }, Math.max(0, b.phaseEndsAt - now()));
+          return;
+        }
+        pushLog(b, `${b.round}라운드 시작`, 'system');
+        startSelectPhase(b, b.nextFirstTeam);
+      }, ROUND_BREAK_MS);
+    };
+    setTimeout(finalize, RESOLVE_WINDOW_MS);
+  }
+
+  // 단일 공격 처리(결과 리턴: { dodged:boolean, damage:number, crit:boolean })
+  function resolveSingleAttack(b, actor, target, useAtkBoost, defBoostIntended, allIntents, once) {
+    if (!actor || !target || actor.hp <= 0 || target.hp <= 0) return null;
+
+    const finalAttack = (actor.stats?.attack ?? 0) * (useAtkBoost ? 2 : 1) + d10();
+
+    // 회피 의도(최초 1회만)
+    const hasDodgeIntent = allIntents.some(c => c.playerId === target.id && c.type === 'dodge');
+    if (hasDodgeIntent && !once.dodgeTried.has(target.id)) {
+      once.dodgeTried.add(target.id);
+      pushLog(b, `→ ${target.name} 회피 판정 시도`, 'result');
+      const dodgeScore = (target.stats?.agility ?? 0) + d10();
+      if (dodgeScore >= finalAttack) {
+        pushLog(b, `→ ${actor.name}의 공격을 ${target.name}이(가) 회피`, 'result');
+        return { dodged: true, damage: 0, crit: false };
+      } else {
+        pushLog(b, `→ ${target.name} 회피 실패`, 'result');
+      }
+    }
+
+    // 치명타
+    const luck = (actor.stats?.luck ?? 0);
+    const critChance = Math.min(0.10, Math.max(0, luck) * 0.02);
+    const isCrit = Math.random() < critChance;
+    const attackValue = isCrit ? (finalAttack * 2) : finalAttack;
+
+    // 방어 가능 여부(최초 1회)
+    const hasDefendIntent = allIntents.some(c => c.playerId === target.id && c.type === 'defend');
+    const canDefend = hasDefendIntent || defBoostIntended.has(target.id);
+    let damage = attackValue;
+
+    if (canDefend && !once.defendTried.has(target.id)) {
+      once.defendTried.add(target.id);
+
+      const useDefBoost = defBoostIntended.has(target.id) && !once.defBoostApplied.has(target.id);
+      const defMul = useDefBoost ? 2 : 1;
+      if (useDefBoost) {
+        once.defBoostApplied.add(target.id);
+        // 🆕 방어 보정기 발동 성공 로그
+        pushLog(b, `→ ${target.name} 방어 발동 성공(보정기 ×2)`, 'result');
+      } else {
+        pushLog(b, `→ ${target.name} 방어 발동`, 'result');
+      }
+
+      const defenseValue = (target.stats?.defense ?? 0) * defMul + d10();
+      damage = Math.max(1, attackValue - defenseValue);
+    }
+
+    target.hp = clamp(target.hp - damage, 0, target.maxHp);
+    pushLog(b, `→ ${actor.name}이(가) ${target.name}에게 ${isCrit ? '치명타 ' : ''}공격 (피해 ${damage}) → HP ${target.hp}`, 'result');
+
+    return { dodged: false, damage, crit: isCrit };
+  }
+
+  // 팀 해석(이니시 순)
+  function resolveTeamByOrder(b, team, defBoostIntended, allIntents, once, defBoostOutcomes) {
+    const intents = (b.choices[team] || []).slice(); if (!intents.length) return;
+
+    const order = sortByInitiative(
+      intents.map(c => b.players.find(p => p.id === c.playerId)).filter(Boolean)
+    ).map(p => p.id);
+
+    for (const pid of order) {
+      const intent = intents.find(c => c.playerId === pid); if (!intent) continue;
+      const actor  = b.players.find(p => p.id === pid);     if (!actor || actor.hp <= 0) continue;
+
+      if (intent.type === 'attack') {
+        const tgt = intent.targetId ? b.players.find(p => p.id === intent.targetId) : null;
+        if (tgt && tgt.hp > 0) {
+          const res = resolveSingleAttack(b, actor, tgt, /*useAtkBoost*/false, defBoostIntended, allIntents, once);
+          // 방어 보정기 실제 적용 여부 기록(해당 공격에서 적용됐을 수 있음)
+          if (once.defBoostApplied.has(tgt.id) && defBoostOutcomes && defBoostOutcomes.has(tgt.id)) {
+            const s = defBoostOutcomes.get(tgt.id); s.applied = true; defBoostOutcomes.set(tgt.id, s);
+          }
+        }
+      } else if (intent.type === 'defend') {
+        pushLog(b, `→ ${actor.name}이(가) 방어 태세`, 'result');
+      } else if (intent.type === 'dodge') {
+        pushLog(b, `→ ${actor.name}이(가) 회피 태세`, 'result');
+      } else if (intent.type === 'item') {
+        // 아이템은 위 선처리에서 처리됨
+      } else if (intent.type === 'pass') {
+        pushLog(b, `→ ${actor.name}이(가) 행동을 생략`, 'result');
+      }
+    }
+    b.choices[team] = [];
+  }
+
+  // 하드리밋 종료
+  function endByHpSum(b) {
+    const sumA = b.players.filter(p => p.team === 'A' && p.hp > 0).reduce((s, p) => s + p.hp, 0);
+    const sumB = b.players.filter(p => p.team === 'B' && p.hp > 0).reduce((s, p) => s + p.hp, 0);
+    pushLog(b, `시간 종료 — 생존 HP 합산: ${teamLabel('A')}=${sumA}, ${teamLabel('B')}=${sumB}`, 'result');
+    if (sumA === sumB) pushLog(b, '무승부 처리', 'result');
+    else pushLog(b, `${teamLabel(sumA > sumB ? 'A' : 'B')} 승리!`, 'result');
+    b.status = 'ended'; b.phase = 'idle'; b.turnCursor = null; b.phaseEndsAt = null; b.phaseToken = null;
+  }
+
+  function end(battleId) {
+    const b = get(battleId); if (!b) return null;
+    b.status = 'ended'; b.phase = 'idle'; b.turnCursor = null; b.phaseEndsAt = null; b.phaseToken = null;
+    touch(b); return b;
+  }
+
+  function authByToken(battleId, token) {
+    const b = get(battleId); if (!b) return null;
+    return b.players.find(p => p.token === token) || null;
+  }
+
+  return {
+    setLogger, setUpdate,
+    size, get, snapshot,
+    create, addPlayer, removePlayer,
+    markReady, start, playerAction,
+    end, authByToken,
+  };
+}
