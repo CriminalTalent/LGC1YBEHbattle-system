@@ -1,6 +1,6 @@
-/* PYXIS UI Helpers (browser)
+/* UI Helpers (browser)
    - 관리자/플레이어/관전자 공용 헬퍼
-   - PyxisNotify(알림) 연동, 없으면 자체 토스트 폴백
+   - Notify(알림) 연동, 없으면 자체 토스트 폴백
    - 팀 표기는 A/B만 사용
    - 이모지 금지
 */
