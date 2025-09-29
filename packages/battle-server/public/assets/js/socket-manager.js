@@ -42,8 +42,32 @@
   function toAB(t) {
     const s = String(t || "").toLowerCase();
     if (s === "phoenix" || s === "a" || s === "team_a" || s === "team-a") return "A";
-    if (s === "eaters" || s === "b" || s === "death" || s === "team_b" || s === "team-b") return "B";
+    if (s === "eaters"  || s === "b" || s === "death"  || s === "team_b" || s === "team-b") return "B";
     return "";
+  }
+
+  // 배틀 스냅샷 내 팀/승자 키 정규화
+  function normalizeBattleSnapshot(b = {}) {
+    const copy = JSON.parse(JSON.stringify(b));
+
+    // 플레이어 팀
+    if (Array.isArray(copy.players)) {
+      copy.players.forEach(p => { p.team = toAB(p.team) || p.team; });
+    }
+    // currentTurn
+    if (copy.currentTurn) {
+      if (copy.currentTurn.currentTeam) {
+        copy.currentTurn.currentTeam = toAB(copy.currentTurn.currentTeam) || copy.currentTurn.currentTeam;
+      }
+      if (copy.currentTurn.currentPlayer && copy.currentTurn.currentPlayer.team) {
+        copy.currentTurn.currentPlayer.team = toAB(copy.currentTurn.currentPlayer.team) || copy.currentTurn.currentPlayer.team;
+      }
+    }
+    // 루트 winner/팀성 키
+    if (copy.winner) copy.winner = toAB(copy.winner) || copy.winner;
+    if (copy.team)   copy.team   = toAB(copy.team)   || copy.team;
+
+    return copy;
   }
 
   /* ──────────────────────────────────────────────
@@ -154,17 +178,17 @@
         this._emitLocal("auth:error", e);
       });
 
-      // ----- 전투 상태(신/구 혼용 수신 → 단일 로컬 이벤트로 통일) -----
-      const forwardBattleUpdate = (b) => this._emitLocal("battle:update", b);
+      // ----- 전투 상태(신/구 혼용 수신 → 단일 로컬 이벤트로 통일, A/B 정규화) -----
+      const forwardBattleUpdate = (b) => this._emitLocal("battle:update", normalizeBattleSnapshot(b));
       s.on("battle:update", forwardBattleUpdate);
       s.on("battleUpdate", forwardBattleUpdate);
       s.on("battleState", forwardBattleUpdate);
       s.on("state:update", forwardBattleUpdate);
 
-      s.on("battle:started", (b) => this._emitLocal("battle:started", b));
-      s.on("battle:paused",  (b) => this._emitLocal("battle:paused",  b));
-      s.on("battle:resumed", (b) => this._emitLocal("battle:resumed", b));
-      s.on("battle:ended",   (b) => this._emitLocal("battle:ended",   b));
+      s.on("battle:started", (b) => this._emitLocal("battle:started", normalizeBattleSnapshot(b)));
+      s.on("battle:paused",  (b) => this._emitLocal("battle:paused",  normalizeBattleSnapshot(b)));
+      s.on("battle:resumed", (b) => this._emitLocal("battle:resumed", normalizeBattleSnapshot(b)));
+      s.on("battle:ended",   (b) => this._emitLocal("battle:ended",   normalizeBattleSnapshot(b)));
 
       // ----- 생성/시작 응답 (서버 이벤트명 양쪽 다 수신) -----
       const forwardCreated = (res) => this._emitLocal("battle:created", res?.battle || res);
@@ -255,15 +279,17 @@
       };
       if (!payload.battleId || !payload.message) return;
       // 구/신 이벤트 동시 전송
-this.socket.emit("chatMessage", payload);
+      this.socket.emit("chatMessage", payload);
+      this.socket.emit("battle:chat", payload);
+      this.socket.emit("chat:message", payload);
     }
 
     sendCheer(cheer, opt = {}) {
       if (!this.socket) return;
       const payload = {
         battleId: opt.battleId || this.ctx.battleId,
-        message: clampLen(cheer || "", 100),            // 레거시 호환 위해 key는 message로도 넣자
-        cheer: clampLen(cheer || "", 100),
+        message: clampLen(cheer || "", 100),   // 레거시 호환 위해 key는 message도 포함
+        cheer:   clampLen(cheer || "", 100),
         name: clampLen(opt.name || this.ctx.name || "", 30),
         team: toAB(opt.team || this.ctx.teamAB || ""),
       };
@@ -349,8 +375,11 @@ this.socket.emit("chatMessage", payload);
     removePlayer(battleId, playerId) {
       if (!this.socket) return;
       const id = battleId || this.ctx.battleId; if (!id || !playerId) return;
+      // 신규/레거시 모두
       this.socket.emit("removePlayer", { battleId: id, playerId });
       this.socket.emit("admin:removePlayer", { battleId: id, playerId }); // 호환
+      this.socket.emit("deletePlayer", { battleId: id, playerId });       // 레거시 명칭 추가
+      this.socket.emit("admin:deletePlayer", { battleId: id, playerId }); // 레거시 호환
     }
 
     updatePlayer(battleId, playerId, updates) {
@@ -398,9 +427,10 @@ this.socket.emit("chatMessage", payload);
     playerAction(playerId, action, battleId) {
       if (!this.socket) return;
       const id = battleId || this.ctx.battleId; if (!id || !playerId || !action) return;
-
-      // 신규this.socket.emit("player:action", { battleId: id, playerId, action });
-}
+      // 신규/레거시 모두 발사
+      this.socket.emit("player:action", { battleId: id, playerId, action });
+      this.socket.emit("playerAction",  { battleId: id, playerId, action }); // 레거시
+    }
 
     /* -----------------------------
      * 관전자
