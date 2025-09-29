@@ -151,8 +151,8 @@
             <div class="form-field">
               <label class="form-label">팀</label>
               <select id="playerTeam" class="form-select">
-                <option value="A">A팀</option>
-                <option value="B">B팀</option>
+                <option value="A">불사조 기사단 팀</option>
+                <option value="B">죽음을 먹는 자 팀</option>
               </select>
             </div>
           </div>
@@ -207,11 +207,11 @@
       </div>
 
       <div class="team-container" style="margin-bottom:12px">
-        <div class="team-title">A팀</div>
+        <div class="team-title">불사조 기사단 팀</div>
         <div id="teamA"></div>
       </div>
       <div class="team-container">
-        <div class="team-title">B팀</div>
+        <div class="team-title">죽음을 먹는 자 팀</div>
         <div id="teamB"></div>
       </div>
     </div>
@@ -253,10 +253,13 @@
   const now = () => Date.now();
   const esc = s => s ? s.replace(/</g,'&lt;').replace(/>/g,'&gt;') : '';
 
+  const teamName = (code) => code === 'A' ? '불사조 기사단' : code === 'B' ? '죽음을 먹는 자' : (code||'');
+
   function logClass(message, type){
     if (type === 'battle' || type === 'item') {
-      if (/(^|\s)A팀|=== A팀| A[1-4]/.test(message)) return 'log-team-a';
-      if (/(^|\s)B팀|=== B팀| B[1-4]/.test(message)) return 'log-team-b';
+      // A/B 표기와 팀 한글명 모두 감지
+      if (/(^|\s)A팀|=== A팀| A[1-4]|불사조 기사단/.test(message)) return 'log-team-a';
+      if (/(^|\s)B팀|=== B팀| B[1-4]|죽음을 먹는 자/.test(message)) return 'log-team-b';
       if (/라운드 종료|승리|전투가|결과|===/.test(message)) return 'log-result';
     }
     if (type === 'notice') return 'log-notice';
@@ -399,7 +402,7 @@
     };
     socket.emit('addPlayer',{battleId:currentBattleId,player:playerData},(res)=>{
       if(res?.ok){
-        addLog({ts:Date.now(),type:'notice',message:`${name}이(가) ${team}팀에 추가되었습니다`});
+        addLog({ts:Date.now(),type:'notice',message:`${name}이(가) ${teamName(team)} 팀에 추가되었습니다`});
         clearPlayerForm();
       } else {
         alert('전투 참가자 추가 실패: ' + (res?.error||'알 수 없는 오류'));
@@ -455,9 +458,9 @@
     for (const link of list){
       const url = link.url;
       const labelName = link.playerName || link.name || '참가자';
-      const team = link.team ? ` (${link.team}팀)` : '';
+      const teamTxt = link.team ? ` (${teamName(link.team)} 팀)` : '';
       html+=`<div class="link-item">
-        <div class="link-label">${esc(labelName)}${team}</div>
+        <div class="link-label">${esc(labelName)}${teamTxt}</div>
         <div class="link-url" onclick="copyToClipboard('${url}', event)">${url}</div>
         <button class="copy-btn" onclick="copyToClipboard('${url}', event)">복사</button>
       </div>`;
@@ -515,9 +518,11 @@
   socket.on('battle:log', addLog);
   socket.on('chatMessage', addChat);
 
+  // 구 이벤트도 백업으로 수신
   socket.on('battleUpdate', (s)=>{ if(!battleState) onSnap(s); });
   socket.on('battleLog', (l)=>{ if(l) addLog(l); });
 
+  // URL 쿼리로 방 지정 시 자동 조인
   const qs=new URLSearchParams(location.search);
   const bid=qs.get('battle');
   if(bid){ currentBattleId=bid; window.currentBattleId=bid; socket.emit('join',{battleId:currentBattleId}); }
