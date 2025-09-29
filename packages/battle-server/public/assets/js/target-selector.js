@@ -1,8 +1,13 @@
 /* packages/battle-server/public/assets/js/target-selector.js
-   PYXIS Target Selector Component - Enhanced Gaming Edition (final)
+   PYXIS Target Selector Component - Enhanced Gaming Edition (final, patched)
    - 팀 표기: 내부/표시는 항상 A/B (phoenix/eaters 입력도 자동 정규화)
    - 키보드 내비게이션, 포커스 복원, 모션 감축 대응, 오디오 컨텍스트 재사용
    - 단일/다중 선택 지원 (멀티셀렉트일 때 Ctrl+Enter로 확인)
+   - 패치 사항:
+     1) battleData 참조 안전화(턴/팀 경로 보정: currentTurn.currentTeam/turnNumber)
+     2) 공개 래퍼 반환: 기본 id, 옵션(returnObjects)으로 객체 반환
+     3) 접근성 강화: listbox에 aria-activedescendant, 카드에 고유 id 부여
+     4) keypress → keydown로 선택 입력 처리 강화
 */
 
 class PyxisTargetSelector {
@@ -248,7 +253,7 @@ class PyxisTargetSelector {
     this.overlay.innerHTML = `
       <div class="target-panel">
         <div class="target-title" id="targetTitle">전투 대상 선택</div>
-        <div class="target-desc" id="targetDesc">화살표로 이동하고 스페이스/엔터로 선택합니다. ${this.options.allowMultiSelect ? 'Ctrl+Enter로 확인합니다.' : ''}</div>
+        <div class="target-desc" id="targetDesc">화살표로 이동하고 스페이스/엔터로 선택합니다.</div>
         <div class="battle-info" style="display:none;">
           <div class="battle-mode"></div>
           <div class="turn-info"></div>
@@ -263,7 +268,7 @@ class PyxisTargetSelector {
           ` : ''}
         </div>
       </div>
-    `;
+    ";
 
     document.body.appendChild(this.overlay);
 
@@ -347,6 +352,7 @@ class PyxisTargetSelector {
       case ' ':
         e.preventDefault();
         if (targetCards[this._focusedIndex]) {
+          // keydown 기반으로 직접 호출
           targetCards[this._focusedIndex].click();
         }
         break;
@@ -368,12 +374,37 @@ class PyxisTargetSelector {
     cards.forEach((card, index) => {
       card.classList.toggle('focused', index === this._focusedIndex);
     });
+    const act = cards[this._focusedIndex];
+    if (act) {
+      // 스크린리더용 현재 활성 항목 지정
+      this.listEl.setAttribute('aria-activedescendant', act.id || '');
+    }
     const behavior = PyxisTargetSelector._shouldReduceMotion() ? 'auto' : 'smooth';
-    cards[this._focusedIndex]?.scrollIntoView({ behavior, block: 'nearest' });
+    act?.scrollIntoView({ behavior, block: 'nearest' });
   }
 
   _onOverlayClick(e) {
     if (e.target === this.overlay) this.hide();
+  }
+
+  _updateBattleInfoBox(battleData) {
+    if (!this.battleInfoEl) return;
+
+    if (battleData) {
+      this.battleInfoEl.style.display = '';
+      this.battleInfoEl.querySelector('.battle-mode').textContent =
+        `${battleData.mode || '2v2'} 전투`;
+
+      const curTeam = battleData.currentTurn?.currentTeam ?? battleData.currentTeam;
+      const ab = this._toAB(curTeam);
+      const turnNum = battleData.currentTurn?.turnNumber ?? battleData.turnNumber ?? 1;
+
+      const parts = [`턴 ${turnNum}`];
+      if (ab === 'A' || ab === 'B') parts.push(`${ab}팀 차례`);
+      this.battleInfoEl.querySelector('.turn-info').textContent = parts.join(' • ');
+    } else {
+      this.battleInfoEl.style.display = 'none';
+    }
   }
 
   show(title, targets, callback, battleData = null) {
@@ -388,17 +419,8 @@ class PyxisTargetSelector {
     this.selectedTargets = [];
     this._focusedIndex = 0;
 
-    // 배틀 정보 UI (A/B 표기)
-    if (this.battleInfoEl && battleData) {
-      this.battleInfoEl.style.display = '';
-      this.battleInfoEl.querySelector('.battle-mode').textContent = `${battleData.mode || '2v2'} 전투`;
-      const ab = this._toAB(battleData.currentTeam);
-      const parts = [`턴 ${battleData.currentTurn || 1}`];
-      if (ab === 'A' || ab === 'B') parts.push(`팀 ${ab} 차례`);
-      this.battleInfoEl.querySelector('.turn-info').textContent = parts.join(' • ');
-    } else if (this.battleInfoEl) {
-      this.battleInfoEl.style.display = 'none';
-    }
+    // 배틀 정보 UI (A/B 표기, 경로 보정)
+    this._updateBattleInfoBox(battleData);
 
     this.renderTargets();
     this.overlay.style.display = 'flex';
@@ -433,6 +455,9 @@ class PyxisTargetSelector {
     card.setAttribute('role', 'option');
     card.setAttribute('aria-selected', 'false');
     card.setAttribute('aria-label', `${target.name || `대상 ${index + 1}`} 선택`);
+    // 접근성용 고유 id
+    const safeId = (target.id || `idx-${index}`).toString().replace(/\s+/g, '_');
+    card.id = `pyxis-target-${safeId}`;
 
     const header = document.createElement('div');
     header.className = 'target-header';
@@ -547,10 +572,10 @@ class PyxisTargetSelector {
         this.selectTarget(target, card);
       };
       card.addEventListener('click', selectHandler);
-      card.addEventListener('keypress', (e) => { if (e.key === 'Enter' || e.key === ' ') selectHandler(e); });
-      if (this.options.enableSoundEffects) {
-        card.addEventListener('mouseenter', () => this.playSound('hover'));
-      }
+      // keydown으로 통일
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') selectHandler(e);
+      });
     }
 
     return card;
@@ -720,12 +745,7 @@ class PyxisTargetSelector {
   updateBattleData(battleData) {
     this.battleData = battleData;
     if (this.battleInfoEl && this.isVisible) {
-      this.battleInfoEl.style.display = '';
-      this.battleInfoEl.querySelector('.battle-mode').textContent = `${battleData.mode || '2v2'} 전투`;
-      const ab = this._toAB(battleData.currentTeam);
-      const parts = [`턴 ${battleData.currentTurn || 1}`];
-      if (ab === 'A' || ab === 'B') parts.push(`팀 ${ab} 차례`);
-      this.battleInfoEl.querySelector('.turn-info').textContent = parts.join(' • ');
+      this._updateBattleInfoBox(battleData);
     }
   }
 
@@ -812,22 +832,33 @@ window.PyxisTarget = new PyxisTargetSelector({
   showAvatar: true
 });
 
-/* 플레이어 클라이언트 호환용 래퍼
-   - 기대 시그니처: window.PYXISTargetSelector.open({ players, onPick, title?, battleData?, allowMultiSelect? })
-   - 단일 선택: onPick(선택 id)
-   - 다중 선택: onPick(선택된 target 배열)  ← (기존 요구에 맞춰 객체 배열 전달; 필요 시 id 배열로 변환 가능)
+/* 플레이어 클라이언트 호환용 래퍼 (패치)
+   - 기대 시그니처: window.PYXISTargetSelector.open({ players, onPick, title?, battleData?, allowMultiSelect?, returnObjects? })
+   - 기본 반환: 단일= id, 다중= id[]
+   - returnObjects: true이면 단일= 객체, 다중= 객체[]
 */
 window.PYXISTargetSelector = {
-  open({ players = [], onPick, title = '전투 대상 선택', battleData = null, allowMultiSelect = false } = {}) {
+  open({
+    players = [],
+    onPick,
+    title = '전투 대상 선택',
+    battleData = null,
+    allowMultiSelect = false,
+    returnObjects = false,
+  } = {}) {
     try {
       window.PyxisTarget.updateOptions({ allowMultiSelect });
-      const normalized = (players || []).map(window.PyxisTargetUtils
-        ? window.PyxisTargetUtils.normalizeTarget
-        : (t) => t
+      const normalized = (players || []).map(
+        window.PyxisTargetUtils ? window.PyxisTargetUtils.normalizeTarget : (t) => t
       );
+
       window.PyxisTarget.show(title, normalized, (selected) => {
-        if (!onPick || typeof onPick !== 'function') return;
-        onPick(selected);
+        if (typeof onPick !== 'function') return;
+        if (Array.isArray(selected)) {
+          onPick(returnObjects ? selected : selected.map(t => t.id));
+        } else {
+          onPick(returnObjects ? selected : selected?.id);
+        }
       }, battleData);
     } catch (e) {
       console.error('PYXISTargetSelector.open 에러:', e);
