@@ -10,6 +10,9 @@
   var BANNER_ID = "pyxis-result-banner";
 
   var Effects = {
+    _bannerTimer: null,
+    _starTimers: [],
+
     init: function () {
       try {
         this.ensureBanner();
@@ -19,10 +22,17 @@
         this.bindCardHover();
         this.bindButtonShimmer();
         this.applyBackdropBlur();
+        window.addEventListener("beforeunload", this.destroy.bind(this), { once: true });
       } catch (e) {
-        // 효과는 보조 기능이므로 실패해도 앱 동작에 영향 주지 않음
         if (window && window.console) console.debug("[effects] init error:", e);
       }
+    },
+
+    destroy: function () {
+      // 타이머 정리
+      if (this._bannerTimer) clearTimeout(this._bannerTimer);
+      this._starTimers.forEach(function (t) { try { clearInterval(t); } catch(_){} });
+      this._starTimers = [];
     },
 
     /* ─────────────────────────────
@@ -39,10 +49,12 @@
     },
 
     observeTimeline: function () {
+      // 실제 페이지들의 로그 id까지 포함
       var timeline =
         document.getElementById("timelineFeed") ||
         document.getElementById("battleLog") ||
-        document.getElementById("log");
+        document.getElementById("log") ||
+        document.getElementById("logPanel");
       if (!timeline || !("MutationObserver" in window)) return;
 
       var observer = new MutationObserver(function (mutations) {
@@ -61,11 +73,13 @@
 
     twinkleStars: function () {
       var stars = document.querySelectorAll(".twinkle-star");
+      var self = this;
       stars.forEach(function (star) {
-        setInterval(function () {
+        var timer = setInterval(function () {
           star.classList.add("twinkle");
           setTimeout(function () { star.classList.remove("twinkle"); }, 1200 + Math.random() * 800);
         }, 2000 + Math.random() * 2000);
+        self._starTimers.push(timer);
       });
     },
 
@@ -98,6 +112,8 @@
       var el = document.createElement("div");
       el.id = BANNER_ID;
       el.className = "pyxis-banner";
+      el.setAttribute("role", "status");
+      el.setAttribute("aria-live", "polite");
       document.body.appendChild(el);
     },
 
@@ -106,7 +122,7 @@
       if (!el) return;
       el.textContent = String(text || "");
       el.className = "pyxis-banner show " + (type || "info");
-      clearTimeout(this._bannerTimer);
+      if (this._bannerTimer) clearTimeout(this._bannerTimer);
       this._bannerTimer = setTimeout(function () {
         el.className = "pyxis-banner";
       }, Math.max(holdMs || 1400, 1200));
