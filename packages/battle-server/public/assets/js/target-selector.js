@@ -1,13 +1,8 @@
 /* packages/battle-server/public/assets/js/target-selector.js
-   PYXIS Target Selector Component - Enhanced Gaming Edition (final, patched)
-   - 팀 표기: 내부/표시는 항상 A/B (phoenix/eaters 입력도 자동 정규화)
+   PYXIS Target Selector Component - Enhanced Gaming Edition (final, KR labels)
+   - 내부 팀 키는 A/B로 정규화 유지, '표시'는 불사조 기사단 / 죽음을 먹는자
    - 키보드 내비게이션, 포커스 복원, 모션 감축 대응, 오디오 컨텍스트 재사용
    - 단일/다중 선택 지원 (멀티셀렉트일 때 Ctrl+Enter로 확인)
-   - 패치 사항:
-     1) battleData 참조 안전화(턴/팀 경로 보정: currentTurn.currentTeam/turnNumber)
-     2) 공개 래퍼 반환: 기본 id, 옵션(returnObjects)으로 객체 반환
-     3) 접근성 강화: listbox에 aria-activedescendant, 카드에 고유 id 부여
-     4) keypress → keydown로 선택 입력 처리 강화
 */
 
 class PyxisTargetSelector {
@@ -55,6 +50,13 @@ class PyxisTargetSelector {
     if (s === 'phoenix' || s === 'a' || s === 'team_a' || s === 'team-a') return 'A';
     if (s === 'eaters'  || s === 'b' || s === 'death'  || s === 'team_b' || s === 'team-b') return 'B';
     return '-';
+  }
+
+  // 표시용 라벨 (A/B → 한글 명칭)
+  _labelTeam(ab) {
+    if (ab === 'A') return '불사조 기사단';
+    if (ab === 'B') return '죽음을 먹는자';
+    return '팀 미상';
   }
 
   init() {
@@ -268,7 +270,7 @@ class PyxisTargetSelector {
           ` : ''}
         </div>
       </div>
-    ";
+    `;
 
     document.body.appendChild(this.overlay);
 
@@ -352,7 +354,6 @@ class PyxisTargetSelector {
       case ' ':
         e.preventDefault();
         if (targetCards[this._focusedIndex]) {
-          // keydown 기반으로 직접 호출
           targetCards[this._focusedIndex].click();
         }
         break;
@@ -376,7 +377,6 @@ class PyxisTargetSelector {
     });
     const act = cards[this._focusedIndex];
     if (act) {
-      // 스크린리더용 현재 활성 항목 지정
       this.listEl.setAttribute('aria-activedescendant', act.id || '');
     }
     const behavior = PyxisTargetSelector._shouldReduceMotion() ? 'auto' : 'smooth';
@@ -400,7 +400,7 @@ class PyxisTargetSelector {
       const turnNum = battleData.currentTurn?.turnNumber ?? battleData.turnNumber ?? 1;
 
       const parts = [`턴 ${turnNum}`];
-      if (ab === 'A' || ab === 'B') parts.push(`${ab}팀 차례`);
+      if (ab === 'A' || ab === 'B') parts.push(`${this._labelTeam(ab)} 차례`);
       this.battleInfoEl.querySelector('.turn-info').textContent = parts.join(' • ');
     } else {
       this.battleInfoEl.style.display = 'none';
@@ -419,7 +419,6 @@ class PyxisTargetSelector {
     this.selectedTargets = [];
     this._focusedIndex = 0;
 
-    // 배틀 정보 UI (A/B 표기, 경로 보정)
     this._updateBattleInfoBox(battleData);
 
     this.renderTargets();
@@ -455,7 +454,6 @@ class PyxisTargetSelector {
     card.setAttribute('role', 'option');
     card.setAttribute('aria-selected', 'false');
     card.setAttribute('aria-label', `${target.name || `대상 ${index + 1}`} 선택`);
-    // 접근성용 고유 id
     const safeId = (target.id || `idx-${index}`).toString().replace(/\s+/g, '_');
     card.id = `pyxis-target-${safeId}`;
 
@@ -480,13 +478,13 @@ class PyxisTargetSelector {
     const info = document.createElement('div');
     info.className = 'target-info';
 
-    // 팀 뱃지(항상 A/B)
+    // 팀 뱃지(표시는 한글 명칭)
     if (this.options.showTeam && (target.team || target.teamAB)) {
       const ab = this._toAB(target.teamAB || target.team);
       if (ab === 'A' || ab === 'B') {
         const team = document.createElement('div');
         team.className = `target-team team-${ab}`;
-        team.textContent = `팀 ${ab}`;
+        team.textContent = this._labelTeam(ab);
         info.appendChild(team);
       }
     }
@@ -572,7 +570,6 @@ class PyxisTargetSelector {
         this.selectTarget(target, card);
       };
       card.addEventListener('click', selectHandler);
-      // keydown으로 통일
       card.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') selectHandler(e);
       });
@@ -615,7 +612,7 @@ class PyxisTargetSelector {
   }
 
   confirm() {
-    if (!this.options.allowMultiSelect) return; // 단일선택 모드에서는 confirm 버튼이 없음
+    if (!this.options.allowMultiSelect) return;
     if (this.selectedTargets.length === 0) return;
     if (this.options.enableSoundEffects) this.playSound('confirm');
     this.hide();
@@ -832,7 +829,7 @@ window.PyxisTarget = new PyxisTargetSelector({
   showAvatar: true
 });
 
-/* 플레이어 클라이언트 호환용 래퍼 (패치)
+/* 플레이어 클라이언트 호환용 래퍼
    - 기대 시그니처: window.PYXISTargetSelector.open({ players, onPick, title?, battleData?, allowMultiSelect?, returnObjects? })
    - 기본 반환: 단일= id, 다중= id[]
    - returnObjects: true이면 단일= 객체, 다중= 객체[]
@@ -867,7 +864,7 @@ window.PYXISTargetSelector = {
   close() { try { window.PyxisTarget.hide(); } catch (_) {} }
 };
 
-/* 유틸리티: A/B·phoenix/eaters 모두 허용 */
+/* 유틸리티: A/B·phoenix/eaters 모두 허용 (표시는 한글 명칭은 상단 라벨러 사용) */
 window.PyxisTargetUtils = window.PyxisTargetUtils || {
   _toAB(team) {
     const s = String(team || '').toLowerCase();
@@ -897,7 +894,7 @@ window.PyxisTargetUtils = window.PyxisTargetUtils || {
     return {
       id: target.id || target.name || Math.random().toString(36),
       name: target.name || '무명의 전사',
-      team: target.team || target.teamAB || 'phoenix', // 원본 유지(표시는 AB로 변환)
+      team: target.team || target.teamAB || 'phoenix', // 원본 유지(표시는 AB→라벨로 처리)
       teamAB: window.PyxisTargetUtils._toAB(target.team || target.teamAB),
       hp, maxHp,
       stats: {
