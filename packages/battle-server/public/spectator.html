@@ -96,12 +96,12 @@
 </head>
 <body>
 <div class="container">
-  <div class="header">남겨진 유산</div> <!-- ← 변경 -->
+  <div class="header">남겨진 유산</div>
 
   <div class="main-grid">
     <div>
       <div class="team-container" style="margin-bottom:12px">
-        <div class="team-title">A팀</div>
+        <div class="team-title">불사조 기사단</div>
         <div id="teamA"></div>
       </div>
 
@@ -136,7 +136,7 @@
 
     <div>
       <div class="team-container" style="margin-bottom:12px">
-        <div class="team-title">B팀</div>
+        <div class="team-title">죽음을 먹는 자</div>
         <div id="teamB"></div>
       </div>
 
@@ -166,6 +166,8 @@
 
 <script>
 (()=> {
+  const teamName = (t)=> t==='A' ? '불사조 기사단' : t==='B' ? '죽음을 먹는 자' : (t||'?');
+
   // battle 파라미터 호환(battle|battleId|bid)
   const qs = new URLSearchParams(location.search);
   const battleId = qs.get('battle') || qs.get('battleId') || qs.get('bid');
@@ -189,7 +191,7 @@
   let timerDisplayLeft = 0;
   let timerTick = null;
 
-  let lastWinnerTeam = null;
+  let lastWinnerTeam = null; // 'A' | 'B'
   let gameOverShown = false;
 
   const esc = s => s ? s.replace(/</g,'&lt;').replace(/>/g,'&gt;') : '';
@@ -202,8 +204,8 @@
     if (type === 'error')  return 'log-error';
     if (type === 'system') return 'log-system';
     const m = message||'';
-    if (/(^|\s)A[1-4]\b|A팀|=== A팀/.test(m)) return 'log-team-a';
-    if (/(^|\s)B[1-4]\b|B팀|=== B팀/.test(m)) return 'log-team-b';
+    if (/(^|\s)A[1-4]\b|A팀|=== A팀|불사조 기사단/.test(m)) return 'log-team-a';
+    if (/(^|\s)B[1-4]\b|B팀|=== B팀|죽음을 먹는 자/.test(m)) return 'log-team-b';
     if (/라운드 해석|승리|결과|===/.test(m)) return 'log-result';
     return 'log-system';
   }
@@ -228,10 +230,14 @@
   function addLog({ts, type, message}){
     if (!message) return;
 
-    // 승자 문구 감지하여 저장(fallback)
+    // 승자 문구 감지(A/B 또는 팀명)
     if (/([AB])팀\s*승리/.test(message)) {
       const m = message.match(/([AB])팀\s*승리/);
       if (m) lastWinnerTeam = m[1];
+    } else if (/불사조\s*기사단\s*승리/.test(message)) {
+      lastWinnerTeam = 'A';
+    } else if (/죽음을\s*먹는\s*자\s*승리/.test(message)) {
+      lastWinnerTeam = 'B';
     }
 
     const phase = battle?.phase || currentPhase;
@@ -320,8 +326,8 @@
     const info = document.getElementById('turnInfo');
 
     const phaseText =
-      battle?.phase === 'A_select' ? 'A팀 선택 중' :
-      battle?.phase === 'B_select' ? 'B팀 선택 중' :
+      battle?.phase === 'A_select' ? '불사조 기사단 선택 중' :
+      battle?.phase === 'B_select' ? '죽음을 먹는 자 선택 중' :
       battle?.phase === 'resolve'  ? '라운드 해석 중' :
       battle?.phase === 'inter'    ? '다음 라운드 대기' : '대기중';
 
@@ -383,7 +389,11 @@
     gameOverShown = true;
     const ov = document.getElementById('gameOver');
     const wt = document.getElementById('winnerText');
-    wt.textContent = winnerTeam ? `${winnerTeam}팀 승리` : '';
+
+    // winnerTeam이 'A'/'B'일 수도, 이미 한글 팀명일 수도 있음
+    const label = (winnerTeam==='A'||winnerTeam==='B') ? `${teamName(winnerTeam)} 승리` :
+                  winnerTeam ? `${winnerTeam} 승리` : '';
+    wt.textContent = label;
     ov.classList.add('show');
   }
   socket.on('battle:ended', (d)=> showGameOverOverlay(d?.winner));
