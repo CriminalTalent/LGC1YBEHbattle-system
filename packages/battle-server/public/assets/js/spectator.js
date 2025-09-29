@@ -1,5 +1,5 @@
 // packages/battle-server/public/assets/js/spectator.js
-// PYXIS 배틀 시스템 - 관전자 페이지 (개선된 버전)
+// PYXIS 배틀 시스템 - 관전자 페이지 (A/B 내부 유지, 표시명만 불사조/죽먹자로 변환)
 (function() {
   'use strict';
 
@@ -18,6 +18,19 @@
     '죽으면 나한테 죽어!',
     '힘내요!'
   ];
+
+  // ─────────────────────────────────
+  // 팀 표기 헬퍼 (UI 표시는 불사조/죽먹자, 내부는 A/B 유지)
+  // ─────────────────────────────────
+  function toAB(t) {
+    const s = String(t || '').toLowerCase();
+    if (s === 'a' || s === 'phoenix' || s === 'team_a' || s === 'team-a') return 'A';
+    if (s === 'b' || s === 'eaters'  || s === 'death'  || s === 'team_b' || s === 'team-b') return 'B';
+    return '';
+  }
+  function teamLabel(ab) {
+    return ab === 'A' ? '불사조 기사단' : ab === 'B' ? '죽음을 먹는 자' : '';
+  }
 
   // DOM 헬퍼
   const $ = (sel) => document.querySelector(sel);
@@ -95,12 +108,8 @@
     socket.on('battle:chat', handleChat);
 
     // 응원 메시지 수신 (채팅에만 표시)
-    socket.on('spectator:cheer', () => {
-      // 응원은 채팅으로만 표시되므로 별도 처리 불필요
-    });
-    socket.on('cheerMessage', () => {
-      // 호환성 유지
-    });
+    socket.on('spectator:cheer', () => {});
+    socket.on('cheerMessage', () => {});
 
     return socket;
   }
@@ -207,10 +216,10 @@
     }
   }
 
-  // 팀 컨테이너 업데이트
+  // 팀 컨테이너 업데이트 (표시는 불사조/죽먹자)
   function updateTeamContainers(battle) {
-    const teamA = battle.players.filter(p => p.team === 'A');
-    const teamB = battle.players.filter(p => p.team === 'B');
+    const teamA = battle.players.filter(p => toAB(p.team) === 'A');
+    const teamB = battle.players.filter(p => toAB(p.team) === 'B');
 
     updateTeamContainer('#teamAContainer', teamA, 'A');
     updateTeamContainer('#teamBContainer', teamB, 'B');
@@ -221,7 +230,8 @@
     const container = $(containerId);
     if (!container) return;
 
-    let html = `<h3>${teamLetter}팀</h3>`;
+    const ab = toAB(teamLetter);
+    let html = `<h3>${teamLabel(ab)}</h3>`;
     html += '<div class="team-players">';
 
     players.forEach(player => {
@@ -264,7 +274,7 @@
     container.innerHTML = html;
   }
 
-  // 턴 정보 업데이트
+  // 턴 정보 업데이트 (표시는 불사조/죽먹자)
   function updateTurnInfo(battle) {
     const turnInfoEl = $('#turnInfo');
     if (turnInfoEl && battle.currentTurn) {
@@ -272,17 +282,20 @@
       let phaseText = '';
 
       switch (turn.phase) {
-        case 'waiting': phaseText = '대기 중'; break;
+        case 'waiting':   phaseText = '대기 중'; break;
         case 'team_action': phaseText = '행동 페이즈'; break;
-        case 'processing': phaseText = '결과 처리 중'; break;
-        case 'switching': phaseText = '팀 교체 중'; break;
+        case 'processing':  phaseText = '결과 처리 중'; break;
+        case 'switching':   phaseText = '팀 교체 중'; break;
         default: phaseText = turn.phase || '';
       }
+
+      const ab = toAB(turn.currentTeam);
+      const label = teamLabel(ab);
 
       turnInfoEl.innerHTML = `
         <div class="turn-display">
           <div class="turn-number">${turn.turnNumber || 0}턴</div>
-          <div class="current-team">${turn.currentTeam || ''}팀 차례</div>
+          <div class="current-team">${label || (turn.currentTeam || '')} 차례</div>
           <div class="phase">${phaseText}</div>
           <div class="time-left">${turn.timeLeftSec || 0}초 남음</div>
         </div>
