@@ -5,6 +5,9 @@
   let currentBattleId = null;
   let connected = false;
 
+  // 팀 라벨 매핑: A/B → 한글 팀명
+  const teamLabel = (t) => (t === 'A' ? '불사조 기사단' : t === 'B' ? '죽음을 먹는 자' : (t || '-'));
+
   // DOM 헬퍼
   const $ = (sel) => document.querySelector(sel);
   const $$ = (sel) => Array.from(document.querySelectorAll(sel));
@@ -171,7 +174,7 @@
 
     const name = $('#playerName')?.value?.trim();
     const team = $('#playerTeam')?.value;
-    const hp = parseInt($('#playerHp')?.value, 10) || 100;
+    const hp = parseInt($('#playerHp')?.value, 10) || parseInt($('#playerHP')?.value, 10) || 100;
     const attack = parseInt($('#playerAttack')?.value, 10) || 1;
     const defense = parseInt($('#playerDefense')?.value, 10) || 1;
     const agility = parseInt($('#playerAgility')?.value, 10) || 1;
@@ -267,7 +270,7 @@
     );
   }
 
-  // 링크 생성 - URL을 pyxisbattlesystem.monster로 변경
+  // 링크 생성
   function generateLinks() {
     if (!currentBattleId) {
       alert('전투 ID가 필요합니다');
@@ -309,7 +312,7 @@
       });
   }
 
-  // 링크 표시 - 도메인을 pyxisbattlesystem.monster로 변경
+  // 링크 표시 - A/B를 한글 팀명으로
   function displayLinks(data) {
     const container = $('#linkContainer');
     if (!container) return;
@@ -362,7 +365,7 @@
 
         html += `
           <div class="player-link-item">
-            <span class="player-info">${player.name || '이름 없음'} (${player.team || '-' }팀)</span>
+            <span class="player-info">${player.name || '이름 없음'} (${teamLabel(player.team)})</span>
             <div class="link-url">
               <input type="text" value="${playerUrl}" readonly onclick="this.select()">
               <button onclick="copyLink('${playerUrl}')">복사</button>
@@ -378,7 +381,7 @@
     container.innerHTML = html;
   }
 
-  // 배틀 정보 업데이트
+  // 배틀 정보 업데이트 (A/B → 한글 팀명)
   function updateBattleInfo(battle) {
     if ($('#currentBattleId')) {
       $('#currentBattleId').textContent = battle.id || '없음';
@@ -392,16 +395,15 @@
 
     // 턴 정보 표시
     if (battle.currentTurn) {
-      const turnInfo = `${battle.currentTurn.turnNumber || 0}턴 - ${
-        battle.currentTurn.currentTeam || 'N/A'
-      }팀 턴`;
+      const teamText = teamLabel(battle.currentTurn.currentTeam || '');
+      const turnInfo = `${battle.currentTurn.turnNumber || 0}턴 - ${teamText} 턴`;
       if ($('#turnInfo')) {
         $('#turnInfo').textContent = turnInfo;
       }
     }
   }
 
-  // 전투 참가자 목록 업데이트
+  // 전투 참가자 목록 업데이트 (헤더/표기 변경)
   function updatePlayerList(players) {
     const container = $('#playerList');
     if (!container) return;
@@ -413,7 +415,7 @@
     const teamB = (players || []).filter((p) => p.team === 'B');
 
     html += '<div class="team-section">';
-    html += '<h3>A팀</h3>';
+    html += `<h3>${teamLabel('A')}</h3>`;
     html += '<div class="team-players">';
 
     teamA.forEach((player) => {
@@ -448,7 +450,7 @@
     html += '</div></div>';
 
     html += '<div class="team-section">';
-    html += '<h3>B팀</h3>';
+    html += `<h3>${teamLabel('B')}</h3>`;
     html += '<div class="team-players">';
 
     teamB.forEach((player) => {
