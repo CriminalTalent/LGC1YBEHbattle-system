@@ -12,11 +12,11 @@
     --glass-1:rgba(0,0,0,.7); --glass-2:rgba(0,0,0,.5);
     --border:rgba(220,199,162,.3);
     --text:#F8F9FA; --muted:#A9AFB6;
-    --gold:#CDCDCD; --gold2:#CDCDCD; /* ← 골드 포인트를 #CDCDCD로 변경 */
+    --gold:#CDCDCD; --gold2:#CDCDCD;
     --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444;
     --shadow:0 10px 30px rgba(0,0,0,.45);
-    --team-a-color:#8b5757;  /* A팀 로그 배경 */
-    --team-b-color:#5d6b8d;  /* B팀 로그 배경 */
+    --team-a-color:#8b5757;  /* 불사조 기사단 로그 배경 */
+    --team-b-color:#5d6b8d;  /* 죽음을 먹는 자 로그 배경 */
     --result-bg:#DCC7A2; --result-text:#000;
   }
   *{box-sizing:border-box;margin:0;padding:0}
@@ -122,13 +122,13 @@
 </head>
 <body>
 <div class="container">
-  <div class="header">남겨진 유산</div> <!-- ← 헤더 텍스트만 변경 -->
+  <div class="header">남겨진 유산</div>
 
   <div class="main-grid">
-    <!-- 좌측: A팀 + 채팅 -->
+    <!-- 좌측: 불사조 기사단 + 채팅 -->
     <div>
       <div class="team-container" style="margin-bottom:12px">
-        <div class="team-title">A팀</div>
+        <div class="team-title">불사조 기사단</div>
         <div id="teamA"></div>
       </div>
 
@@ -151,7 +151,7 @@
                onerror="this.style.background='#000';this.removeAttribute('src')"/>
           <div class="my-details">
             <div id="myName" class="my-name">전투 참가자</div>
-            <div class="my-team"><span id="myTeam">?</span>팀</div>
+            <div class="my-team" id="myTeamText">팀 정보</div>
           </div>
           <button id="readyBtn" class="ready-btn" type="button">준비 완료</button>
         </div>
@@ -181,10 +181,10 @@
       </div>
     </div>
 
-    <!-- 우측: B팀 + 로그 -->
+    <!-- 우측: 죽음을 먹는 자 + 로그 -->
     <div>
       <div class="team-container" style="margin-bottom:12px">
-        <div class="team-title">B팀</div>
+        <div class="team-title">죽음을 먹는 자</div>
         <div id="teamB"></div>
       </div>
 
@@ -215,6 +215,8 @@
 
 <script>
 (()=> {
+  const teamName = (t)=> t==='A' ? '불사조 기사단' : t==='B' ? '죽음을 먹는 자' : (t||'?');
+
   const qs = new URLSearchParams(location.search);
   const battleId = qs.get('battle');
   const token    = qs.get('token');
@@ -233,7 +235,7 @@
   let timerDisplayLeft = 0;
   let timerTick = null;
 
-  let lastWinnerTeam = null;          // 로그에서 감지한 승자(서버 이벤트 fallback)
+  let lastWinnerTeam = null;          // 승자(A/B) 추정
   let gameOverShown = false;
 
   const seenLogIds = new Set(); // 로그 중복만 제한(채팅은 중복 제한 X)
@@ -248,8 +250,8 @@
     if (type === 'error')  return 'log-error';
     if (type === 'system') return 'log-system';
     const m = message || '';
-    if (/A팀|=== A팀| A\d/.test(m)) return 'log-team-a';
-    if (/B팀|=== B팀| B\d/.test(m)) return 'log-team-b';
+    if (/A팀|=== A팀| A\d|불사조 기사단/.test(m)) return 'log-team-a';
+    if (/B팀|=== B팀| B\d|죽음을 먹는 자/.test(m)) return 'log-team-b';
     if (/라운드 해석|승리|결과|===/.test(m)) return 'log-result';
     return 'log-system';
   }
@@ -262,7 +264,7 @@
     if (live) myPlayer = live;
 
     document.getElementById('myName').textContent = myPlayer.name || '전투 참가자';
-    document.getElementById('myTeam').textContent = myPlayer.team || '?';
+    document.getElementById('myTeamText').textContent = teamName(myPlayer.team);
 
     const maxHp = Number.isFinite(myPlayer.maxHp) ? myPlayer.maxHp : 100;
     const hp    = Number.isFinite(myPlayer.hp) ? myPlayer.hp : maxHp;
@@ -322,7 +324,6 @@
   /* 타이머 표시(1초 감산, inter 페이즈는 최소 5초 보장) */
   function startLocalTimer(seconds){
     clearInterval(timerTick);
-    // inter(라운드 간) 페이즈는 최소 5초 보장 표시
     const phase = battleState?.phase;
     let startSec = Math.max(0, seconds|0);
     if (phase === 'inter' && startSec < 5) startSec = 5;
@@ -348,8 +349,8 @@
     const turn = battleState?.currentTurn || {};
     const phase = battleState?.phase;
     const phaseText =
-      phase === 'A_select' ? 'A팀 선택 중' :
-      phase === 'B_select' ? 'B팀 선택 중' :
+      phase === 'A_select' ? '불사조 기사단 선택 중' :
+      phase === 'B_select' ? '죽음을 먹는 자 선택 중' :
       phase === 'resolve'  ? '라운드 해석 중' :
       phase === 'inter'    ? '다음 라운드 대기' : '대기중';
 
@@ -361,7 +362,7 @@
     const curImg = document.getElementById('currentPortrait');
     if (cp?.avatar) { curImg.src = cp.avatar; } else { curImg.removeAttribute('src'); curImg.style.background = '#000'; }
 
-    // 타이머(서버 값으로 재동기화 후 매초 감산; inter는 최소 5초 보장)
+    // 타이머
     const t = Math.max(0, turn?.timeLeftSec|0);
     startLocalTimer(t);
 
@@ -397,10 +398,14 @@
   function addLog({ts,type,message}) {
     if (!message) return;
 
-    // 승자 문구를 감지해 저장(서버에서 battle:ended 이벤트 못 받을 때 fallback)
+    // 승자 문구 감지: A/B 또는 한글 팀명 모두 대응
     if (/([AB])팀\s*승리/.test(message)) {
       const m = message.match(/([AB])팀\s*승리/);
       if (m) lastWinnerTeam = m[1];
+    } else if (/불사조 기사단\s*승리/.test(message)) {
+      lastWinnerTeam = 'A';
+    } else if (/죽음을 먹는 자\s*승리/.test(message)) {
+      lastWinnerTeam = 'B';
     }
 
     const idKey = `${ts}|${type}|${message}`;
@@ -561,7 +566,7 @@
     gameOverShown = true;
     const ov = document.getElementById('gameOver');
     const wt = document.getElementById('winnerText');
-    wt.textContent = winnerTeam ? `${winnerTeam}팀 승리` : '';
+    wt.textContent = winnerTeam ? `${teamName(winnerTeam)} 승리` : '';
     ov.classList.add('show');
     // 모든 인터랙션 비활성화
     ['attackBtn','defendBtn','dodgeBtn','itemBtn','passBtn','readyBtn','chatSend','chatInput']
@@ -571,11 +576,11 @@
   socket.on('battle:ended', (d)=> showGameOverOverlay(d?.winner));
   socket.on('battleEnded',  (d)=> showGameOverOverlay(d?.winner));
 
-  // 스냅샷만으로 종료를 감지하는 보조 로직(로그에서 승자 문구 파악)
+  // 스냅샷만으로 종료를 감지하는 보조 로직
   function maybeShowGameOverByStatus(){
     if (!battleState) return;
     if (battleState.status === 'ended') {
-      showGameOverOverlay(lastWinnerTeam); // 없으면 빈 문자열(문구 미표시)로 처리
+      showGameOverOverlay(lastWinnerTeam);
     }
   }
 
