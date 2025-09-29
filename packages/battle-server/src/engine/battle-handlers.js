@@ -1,6 +1,9 @@
 // packages/battle-server/src/engine/battle-handlers.js
 // Glue between socket and engine
 export function makeBattleHandlers({ battles, io }) {
+  // ▼ 표시용 팀명(내부 키는 A/B 유지)
+  const teamName = (t) => (t === 'A' ? '불사조 기사단' : t === 'B' ? '죽음을 먹는자' : String(t));
+
   function emitUpdate(bid) {
     const b = battles.snapshot(bid);
     if (!b) return;
@@ -42,7 +45,7 @@ export function makeBattleHandlers({ battles, io }) {
 
     addPlayer(bid, player) {
       const p = battles.addPlayer(bid, player);
-      pushLog(bid, 'system', `전투 참가자 추가: ${p.name} (${p.team}팀)`);
+      pushLog(bid, 'system', `전투 참가자 추가: ${p.name} (${teamName(p.team)})`);
       emitUpdate(bid);
       return p;
     },
@@ -76,7 +79,7 @@ export function makeBattleHandlers({ battles, io }) {
       pushLog(
         b.id,
         'battle',
-        `선공 판정: A팀(${sumA} + D20=${rA} → ${totalA}) / B팀(${sumB} + D20=${rB} → ${totalB}) → 선공: ${first}팀`
+        `선공 판정: ${teamName('A')}(${sumA} + D20=${rA} → ${totalA}) / ${teamName('B')}(${sumB} + D20=${rB} → ${totalB}) → 선공: ${teamName(first)}`
       );
       emitUpdate(b.id);
       return b;
@@ -92,13 +95,13 @@ export function makeBattleHandlers({ battles, io }) {
 
       if (phase === 'switch') {
         const b = battles.get(bid);
-        pushLog(bid, 'battle', `턴 교대 → ${b.currentTurn.currentTeam}팀`);
+        pushLog(bid, 'battle', `턴 교대 → ${teamName(b.currentTurn.currentTeam)}`);
         emitUpdate(bid);
       }
 
       if (phase === 'roundEnd') {
         const b = battles.get(bid);
-        pushLog(bid, 'battle', `라운드 종료 → 다음 라운드 ${b.currentTurn.turnNumber} 시작 (선공 ${b.currentTurn.currentTeam}팀)`);
+        pushLog(bid, 'battle', `라운드 종료 → 다음 라운드 ${b.currentTurn.turnNumber} 시작 (선공 ${teamName(b.currentTurn.currentTeam)})`);
         emitUpdate(bid);
       }
       return result;
